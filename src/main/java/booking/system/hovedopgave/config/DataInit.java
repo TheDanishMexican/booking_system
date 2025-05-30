@@ -11,18 +11,18 @@ import java.time.LocalDateTime;
 public class DataInit implements CommandLineRunner {
 
     private final AdminRepository adminRepo;
-    private final ServiceRepository serviceRepo;
+    private final OfferedServiceRepository offeredServiceRepo;
     private final TimeSlotRepository timeSlotRepo;
     private final CustomerRepository customerRepo;
 
     public DataInit(
             AdminRepository adminRepo,
-            ServiceRepository serviceRepo,
+            OfferedServiceRepository offeredServiceRepo,
             TimeSlotRepository timeSlotRepo,
             CustomerRepository customerRepo
     ) {
         this.adminRepo = adminRepo;
-        this.serviceRepo = serviceRepo;
+        this.offeredServiceRepo = offeredServiceRepo;
         this.timeSlotRepo = timeSlotRepo;
         this.customerRepo = customerRepo;
     }
@@ -38,18 +38,18 @@ public class DataInit implements CommandLineRunner {
         admin = adminRepo.save(admin);
 
         // Service
-        Service service = new Service();
-        service.setName("Private Yoga");
-        service.setDescription("1-on-1 session");
-        service.setPrice(300.0);
-        service.setAdmin(admin);
-        service = serviceRepo.save(service);
+        OfferedService offeredService = new OfferedService();
+        offeredService.setName("Private Yoga");
+        offeredService.setDescription("1-on-1 session");
+        offeredService.setPrice(300.0);
+        offeredService.setAdmin(admin);
+        offeredService = offeredServiceRepo.save(offeredService);
 
         // TimeSlot
         TimeSlot timeSlot = new TimeSlot();
         timeSlot.setStartTime(LocalDateTime.of(2025, 6, 1, 10, 0));
         timeSlot.setEndTime(LocalDateTime.of(2025, 6, 1, 11, 0));
-        timeSlot.setService(service);
+        timeSlot.setOfferedService(offeredService);
         timeSlotRepo.save(timeSlot);
 
         // Customer

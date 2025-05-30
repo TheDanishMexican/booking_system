@@ -22,6 +22,6 @@ public class TimeSlot {
 
     @ManyToOne
     @JoinColumn(name = "service_id")
-    private Service service;
+    private OfferedService offeredService;
 }
 
