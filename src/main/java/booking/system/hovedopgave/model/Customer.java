@@ -5,23 +5,17 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
+@Entity
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
-@Entity
-public class TimeSlot {
+public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
-
-    @ManyToOne
-    @JoinColumn(name = "service_id")
-    private Service service;
+    private String name;
+    private String email;
+    private String phone;
 }
-

@@ -5,23 +5,21 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Entity
-public class TimeSlot {
+public class Admin {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String username;
+    private String password;
+    private String name;
+    @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Service> services;
 
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
-
-    @ManyToOne
-    @JoinColumn(name = "service_id")
-    private Service service;
 }
-
