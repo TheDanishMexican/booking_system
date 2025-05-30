@@ -16,8 +16,4 @@ public class OfferedService {
     private String name;
     private String description;
     private Double price;
-    @ManyToOne
-    @JoinColumn(name = "admin_id")
-    private Admin admin;
-
 }

@@ -23,6 +23,9 @@ public class CustomerService {
     }
 
     public Customer saveCustomer(Customer customer) {
+        if (customerRepository.findByEmail(customer.getEmail()).isPresent()) {
+            throw new RuntimeException("A customer with this email already exists: " + customer.getEmail());
+        }
         return customerRepository.save(customer);
     }
 }

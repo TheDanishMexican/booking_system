@@ -24,6 +24,11 @@ public class TimeSlotController {
         return timeSlotService.getTimeSlotById(id);
     }
 
+    @GetMapping("/service/{serviceId}")
+    public List<TimeSlot> getTimeSlotsByServiceId(@PathVariable Long serviceId) {
+        return timeSlotService.getTimeSlotsByServiceId(serviceId);
+    }
+
     @PostMapping
     public TimeSlot createTimeSlot(@RequestBody TimeSlot timeSlot) {
         return timeSlotService.createTimeSlot(timeSlot);

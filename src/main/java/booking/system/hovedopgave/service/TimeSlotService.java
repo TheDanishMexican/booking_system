@@ -36,5 +36,10 @@ public class TimeSlotService {
                 .orElseThrow(() -> new RuntimeException("TimeSlot not found with id: " + id));
         timeSlotRepository.delete(timeSlot);
     }
+
+    public List<TimeSlot> getTimeSlotsByServiceId(Long serviceId) {
+        return timeSlotRepository.findByOfferedServiceId(serviceId);
+    }
+
 }
 

@@ -27,8 +27,6 @@ public class OfferedServiceService {
     }
 
     public OfferedService createService(OfferedService service) {
-        Admin admin = adminService.getAdminById(service.getAdmin().getId());
-        service.setAdmin(admin);
         return offeredServiceRepository.save(service);
     }
 

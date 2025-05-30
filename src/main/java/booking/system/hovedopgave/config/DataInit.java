@@ -42,8 +42,13 @@ public class DataInit implements CommandLineRunner {
         offeredService.setName("Private Yoga");
         offeredService.setDescription("1-on-1 session");
         offeredService.setPrice(300.0);
-        offeredService.setAdmin(admin);
         offeredService = offeredServiceRepo.save(offeredService);
+
+        OfferedService offeredService2 = new OfferedService();
+        offeredService2.setName("Group Yoga");
+        offeredService2.setDescription("Group session for up to 5 people");
+        offeredService2.setPrice(150.0);
+        offeredService2 = offeredServiceRepo.save(offeredService2);
 
         // TimeSlot
         TimeSlot timeSlot = new TimeSlot();
@@ -51,6 +56,12 @@ public class DataInit implements CommandLineRunner {
         timeSlot.setEndTime(LocalDateTime.of(2025, 6, 1, 11, 0));
         timeSlot.setOfferedService(offeredService);
         timeSlotRepo.save(timeSlot);
+
+        TimeSlot timeSlot2 = new TimeSlot();
+        timeSlot2.setStartTime(LocalDateTime.of(2025, 6, 3, 11, 0));
+        timeSlot2.setEndTime(LocalDateTime.of(2025, 6, 3, 12, 0));
+        timeSlot2.setOfferedService(offeredService2);
+        timeSlotRepo.save(timeSlot2);
 
         // Customer
         Customer customer = new Customer();
