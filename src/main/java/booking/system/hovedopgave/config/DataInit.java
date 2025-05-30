@@ -32,7 +32,7 @@ public class DataInit implements CommandLineRunner {
 
         // Admin
         Admin admin = new Admin();
-        admin.setUsername("yogamaster");
+        admin.setEmail("yogamaster@email.com");
         admin.setPassword("secret");
         admin.setName("Anna");
         admin = adminRepo.save(admin);

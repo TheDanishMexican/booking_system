@@ -15,5 +15,9 @@ public class AdminService {
         return adminRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Admin not found"));
     }
+
+    public Admin saveAdmin(Admin admin) {
+        return adminRepository.save(admin);
+    }
 }
 
