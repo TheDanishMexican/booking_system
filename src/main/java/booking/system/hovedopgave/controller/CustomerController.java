@@ -19,8 +19,8 @@ public class CustomerController {
         return customerService.getAllCustomers();
     }
 
-    @GetMapping("/email")
-    public Customer getCustomerByEmail(@RequestParam String email) {
+    @GetMapping("/email/{email}")
+    public Customer getCustomerByEmail(@PathVariable String email) {
         return customerService.findByEmail(email);
     }
 

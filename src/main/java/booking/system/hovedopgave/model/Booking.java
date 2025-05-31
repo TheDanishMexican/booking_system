@@ -1,5 +1,7 @@
 package booking.system.hovedopgave.model;
 
+import booking.system.hovedopgave.model.BookingStatus;
+import booking.system.hovedopgave.model.TimeSlot;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,8 +26,9 @@ public class Booking {
     @JoinColumn(name = "time_slot_id")
     private TimeSlot timeSlot;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
+    private String email;
+    private String name;
+    private String phone;
 }
+
 

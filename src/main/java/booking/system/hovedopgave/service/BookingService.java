@@ -21,21 +21,19 @@ public class BookingService {
 
 
     public Booking createBooking(BookingRequest bookingRequest) {
-        TimeSlot timeSlot = timeSlotService
-                .getTimeSlotById(bookingRequest.timeSlotId());
-
-        Customer customer = customerService
-                .findByEmail(bookingRequest.customerEmail());
+        TimeSlot timeSlot = timeSlotService.getTimeSlotById(bookingRequest.timeSlotId());
 
         Booking booking = new Booking();
-
         booking.setTimeSlot(timeSlot);
-        booking.setCustomer(customer);
+        booking.setEmail(bookingRequest.email());
+        booking.setName(bookingRequest.name());
+        booking.setPhone(bookingRequest.phone());
         booking.setPaid(true);
         booking.setStatus(BookingStatus.CONFIRMED);
 
         return bookingRepository.save(booking);
     }
+
 
     public List<Booking> getAllBookings() {
         return bookingRepository.findAll();
