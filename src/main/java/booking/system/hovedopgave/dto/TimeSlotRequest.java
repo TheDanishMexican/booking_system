@@ -1,6 +1,7 @@
 package booking.system.hovedopgave.dto;
 
 import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
@@ -17,8 +18,14 @@ public record TimeSlotRequest(
         @NotNull(message = "Service ID is required")
         Long offeredServiceId,
 
-        @NotNull(message = "Location is required")
-        String location
-) {}
+        @NotBlank(message = "Location is required")
+        String location,
+
+        @NotNull(message = "Max participants is required")
+        Integer maxParticipants
+
+
+) {
+}
 
 

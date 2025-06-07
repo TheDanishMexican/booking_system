@@ -1,6 +1,7 @@
 package booking.system.hovedopgave.service;
 
 import booking.system.hovedopgave.dto.BookingRequest;
+import booking.system.hovedopgave.exception.BookingException;
 import booking.system.hovedopgave.model.*;
 import booking.system.hovedopgave.repository.BookingRepository;
 import jakarta.transaction.Transactional;
@@ -17,43 +18,42 @@ public class BookingService {
 
     @Autowired
     private TimeSlotService timeSlotService;
-    @Autowired
-    private CustomerService customerService;
 
     @Transactional
     public Booking createBooking(BookingRequest request) {
         try {
-            TimeSlot slot = timeSlotService.getTimeSlotById(request.timeSlotId());
+            TimeSlot timeSlot = timeSlotService.getTimeSlotById(request.timeSlotId());
 
+            timeSlotService.checkTimeSlotAvailability(timeSlot);
 
             Booking booking = new Booking();
             booking.setEmail(request.email());
             booking.setName(request.name());
             booking.setPhone(request.phone());
-            booking.setTimeSlot(slot);
+            booking.setTimeSlot(timeSlot);
             booking.setStatus(BookingStatus.CONFIRMED);
             booking.setPaid(true);
             booking = bookingRepository.save(booking);
 
-            if (bookingRepository.countByTimeSlotId(slot.getId()) >= slot.getMaxParticipants()) {
-                timeSlotService.markAsUnavailableIfFull(slot);
-            }
+            timeSlotService.setTimeSlotUnavailableIfFull(timeSlot);
 
             return booking;
 
         } catch (Exception e) {
-            throw new RuntimeException("Booking failed: " + e.getMessage());
+            throw new BookingException("Booking failed: " + e.getMessage(), e);
         }
     }
-
-
 
     public List<Booking> getAllBookings() {
         return bookingRepository.findAll();
     }
 
     public void deleteBooking(Long id) {
+        if (!bookingRepository.existsById(id)) {
+            throw new BookingException("Booking with ID " + id + " does not exist");
+        }
         bookingRepository.deleteById(id);
     }
+
 }
 

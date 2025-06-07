@@ -1,5 +1,6 @@
 package booking.system.hovedopgave.controller;
 
+import booking.system.hovedopgave.dto.OfferedServiceRequest;
 import booking.system.hovedopgave.model.OfferedService;
 import booking.system.hovedopgave.service.OfferedServiceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +26,8 @@ public class OfferedServiceController {
     }
 
     @PostMapping
-    public OfferedService createService(@RequestBody OfferedService offeredService) {
-        return offeredServiceService.createService(offeredService);
+    public OfferedService createService(@RequestBody OfferedServiceRequest offeredServiceRequest) {
+        return offeredServiceService.createService(offeredServiceRequest);
     }
 
     @DeleteMapping("/{id}")

@@ -1,8 +1,11 @@
 package booking.system.hovedopgave.service;
 
 import booking.system.hovedopgave.dto.TimeSlotRequest;
+import booking.system.hovedopgave.exception.BookingException;
+import booking.system.hovedopgave.exception.TimeSlotException;
 import booking.system.hovedopgave.model.OfferedService;
 import booking.system.hovedopgave.model.TimeSlot;
+import booking.system.hovedopgave.repository.BookingRepository;
 import booking.system.hovedopgave.repository.TimeSlotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +19,8 @@ public class TimeSlotService {
     private TimeSlotRepository timeSlotRepository;
     @Autowired
     private OfferedServiceService offeredServiceService;
+    @Autowired
+    private BookingRepository bookingRepository;
 
     public List<TimeSlot> getAllTimeSlots() {
         return timeSlotRepository.findAll();
@@ -23,7 +28,7 @@ public class TimeSlotService {
 
     public TimeSlot getTimeSlotById(Long id) {
         return timeSlotRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("TimeSlot not found with id: " + id));
+                .orElseThrow(() -> new TimeSlotException("TimeSlot not found with id: " + id));
     }
 
     public TimeSlot createTimeSlot(TimeSlotRequest request) {
@@ -35,27 +40,42 @@ public class TimeSlotService {
             timeSlot.setEndTime(request.endTime());
             timeSlot.setOfferedService(service);
             timeSlot.setLocation(request.location());
+            timeSlot.setMaxParticipants(request.maxParticipants());
+            timeSlot.setIsAvailable(true);
             return timeSlotRepository.save(timeSlot);
 
         } catch (Exception e) {
-            throw new RuntimeException("Time slot creation failed: " + e.getMessage());
+            throw new TimeSlotException("Time slot creation failed: ", e);
         }
     }
 
-
     public void deleteTimeSlot(Long id) {
-        TimeSlot timeSlot = timeSlotRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("TimeSlot not found with id: " + id));
-        timeSlotRepository.delete(timeSlot);
+        if (!timeSlotRepository.existsById(id)) {
+            throw new TimeSlotException("TimeSlot with ID " + id + " does not exist");
+        }
+        timeSlotRepository.deleteById(id);
     }
 
-    public List<TimeSlot> getTimeSlotsByServiceId(Long serviceId) {
+    public List<TimeSlot> getAvailableTimeSlotsByServiceId(Long serviceId) {
         return timeSlotRepository.findAllByOfferedService_IdAndIsAvailableTrue(serviceId);
     }
 
-    public void markAsUnavailableIfFull(TimeSlot timeSlot) {
+    private void markAsUnavailableIfFull(TimeSlot timeSlot) {
         timeSlot.setIsAvailable(false);
         timeSlotRepository.save(timeSlot);
+    }
+
+    //Had to use the BookingRepository directly to avoid circular dependency issues
+    public void setTimeSlotUnavailableIfFull(TimeSlot timeSlot) {
+        if (bookingRepository.countByTimeSlotId(timeSlot.getId()) >= timeSlot.getMaxParticipants()) {
+            markAsUnavailableIfFull(timeSlot);
+        }
+    }
+
+    public void checkTimeSlotAvailability(TimeSlot timeSlot) {
+        if (!timeSlot.getIsAvailable()) {
+            throw new TimeSlotException("Time slot full, not available for booking");
+        }
     }
 
 }

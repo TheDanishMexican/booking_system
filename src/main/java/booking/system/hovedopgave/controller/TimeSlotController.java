@@ -33,8 +33,8 @@ public class TimeSlotController {
     }
 
     @GetMapping("/service/{serviceId}")
-    public ResponseEntity<List<TimeSlot>> getTimeSlotsByServiceId(@PathVariable Long serviceId) {
-        return ResponseEntity.ok().body(timeSlotService.getTimeSlotsByServiceId(serviceId));
+    public ResponseEntity<List<TimeSlot>> getAvailableTimeSlotsByServiceId(@PathVariable Long serviceId) {
+        return ResponseEntity.ok().body(timeSlotService.getAvailableTimeSlotsByServiceId(serviceId));
     }
 
     @PostMapping

@@ -33,7 +33,8 @@ public class TimeSlotServiceTest {
                 LocalDateTime.now().plusDays(2),
                 LocalDateTime.now().plusDays(2).plusHours(1),
                 service.getId(),
-                "Room 101"
+                "Room 101",
+                1
         );
 
         // Create time slot
@@ -51,7 +52,8 @@ public class TimeSlotServiceTest {
                 LocalDateTime.now().plusHours(1),
                 LocalDateTime.now().plusHours(2),
                 9999L,
-                "Room 102"
+                "Room 102",
+                1
         );
 
         Exception exception = assertThrows(RuntimeException.class, () -> {

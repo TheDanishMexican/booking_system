@@ -1,6 +1,9 @@
 package booking.system.hovedopgave.service;
 
 import booking.system.hovedopgave.dto.BookingRequest;
+import booking.system.hovedopgave.dto.OfferedServiceRequest;
+import booking.system.hovedopgave.dto.TimeSlotRequest;
+import booking.system.hovedopgave.exception.BookingException;
 import booking.system.hovedopgave.model.*;
 import booking.system.hovedopgave.repository.*;
 import org.junit.jupiter.api.Test;
@@ -18,57 +21,104 @@ public class BookingServiceTest {
     private BookingService bookingService;
 
     @Autowired
-    private TimeSlotRepository timeSlotRepository;
+    private TimeSlotService timeSlotService;
 
     @Autowired
-    private OfferedServiceRepository offeredServiceRepository;
+    private OfferedServiceService offeredServiceService;
 
+    //Happy case path
     @Test
     public void testCreateValidBooking() {
-        // Create and save a service
-        OfferedService service = new OfferedService();
-        service.setName("Test Service");
-        offeredServiceRepository.save(service);
 
-        // Create and save a time slot linked to the service
-        TimeSlot slot = new TimeSlot();
-        slot.setStartTime(LocalDateTime.now().plusDays(1));
-        slot.setEndTime(LocalDateTime.now().plusDays(1).plusHours(1));
-        slot.setOfferedService(service);
-        timeSlotRepository.save(slot);
+        OfferedServiceRequest offeredServiceRequest = new OfferedServiceRequest(
+                "Test Service",
+                "This is a test service",
+                100.0
+        );
 
-        // Build a booking request
-        BookingRequest request = new BookingRequest(
+        OfferedService offeredService = offeredServiceService.createService(offeredServiceRequest);
+
+        TimeSlotRequest timeSlotRequest = new TimeSlotRequest(
+                LocalDateTime.now().plusDays(1),
+                LocalDateTime.now().plusDays(1).plusHours(1),
+                offeredService.getId(),
+                "Test Location",
+                1
+        );
+
+
+        TimeSlot timeSlot = timeSlotService.createTimeSlot(timeSlotRequest);
+
+        BookingRequest bookingRequest = new BookingRequest(
                 "test@example.com",
                 "Daniel",
                 "12345678",
-                slot.getId()
+                timeSlot.getId()
         );
 
-        // Call service method
-        Booking booking = bookingService.createBooking(request);
+        Booking booking = bookingService.createBooking(bookingRequest);
 
-        // Assertions
         assertNotNull(booking.getId());
         assertEquals("Daniel", booking.getName());
         assertEquals("test@example.com", booking.getEmail());
-        assertEquals(slot.getId(), booking.getTimeSlot().getId());
+        assertEquals(timeSlot.getId(), booking.getTimeSlot().getId());
     }
 
+    //Failure case path
     @Test
     public void testCreateBookingFailsWhenTimeSlotMissing() {
         BookingRequest request = new BookingRequest(
                 "test@example.com",
                 "Daniel",
                 "12345678",
-                9999L // use an ID that doesn’t exist
+                9999L
         );
 
-        Exception exception = assertThrows(RuntimeException.class, () -> {
+        Exception exception = assertThrows(BookingException.class, () -> {
             bookingService.createBooking(request);
         });
 
-        assertTrue(exception.getMessage().contains("Booking failed"));
+        assertTrue(exception.getMessage().contains("Booking failed"), "Should fail when time slot is missing");
     }
 
+    //Edge case path
+    @Test
+    public void testCreateBookingFailsWhenTimeSlotIsFull() {
+        OfferedServiceRequest offeredServiceRequest = new OfferedServiceRequest(
+                "Test Service",
+                "This is a test service",
+                100.0
+        );
+        OfferedService offeredService = offeredServiceService.createService(offeredServiceRequest);
+
+        TimeSlotRequest timeSlotRequest = new TimeSlotRequest(
+                LocalDateTime.now().plusDays(2),
+                LocalDateTime.now().plusDays(2).plusHours(1),
+                offeredService.getId(),
+                "Test Location",
+                1
+        );
+        TimeSlot timeSlot = timeSlotService.createTimeSlot(timeSlotRequest);
+
+        BookingRequest bookingRequest1 = new BookingRequest(
+                "test1@example.com",
+                "Daniel",
+                "12345678",
+                timeSlot.getId()
+        );
+        bookingService.createBooking(bookingRequest1);
+
+        BookingRequest bookingRequest2 = new BookingRequest(
+                "test2@example.com",
+                "Anna",
+                "87654321",
+                timeSlot.getId()
+        );
+
+        Exception exception = assertThrows(BookingException.class, () -> bookingService.createBooking(bookingRequest2));
+
+        assertTrue(exception.getMessage().toLowerCase().contains("full")
+                        || exception.getMessage().toLowerCase().contains("not available"),
+                "Should fail because the timeslot is full or unavailable");
+    }
 }
