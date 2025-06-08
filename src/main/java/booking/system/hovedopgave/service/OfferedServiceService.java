@@ -1,11 +1,10 @@
 package booking.system.hovedopgave.service;
 
 import booking.system.hovedopgave.dto.OfferedServiceRequest;
+import booking.system.hovedopgave.dto.OfferedServiceResponse;
 import booking.system.hovedopgave.exception.OfferedServiceException;
-import booking.system.hovedopgave.model.Admin;
 import booking.system.hovedopgave.model.OfferedService;
 import booking.system.hovedopgave.repository.OfferedServiceRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,9 +12,11 @@ import java.util.List;
 @Service
 public class OfferedServiceService {
 
-    @Autowired
-    private OfferedServiceRepository offeredServiceRepository;
+    private final OfferedServiceRepository offeredServiceRepository;
 
+    public OfferedServiceService(OfferedServiceRepository offeredServiceRepository) {
+        this.offeredServiceRepository = offeredServiceRepository;
+    }
 
     public List<OfferedService> getAllServices() {
         return offeredServiceRepository.findAll();
@@ -26,17 +27,17 @@ public class OfferedServiceService {
                 .orElseThrow(() -> new OfferedServiceException("Service not found with id: " + id));
     }
 
-    public OfferedService createService(OfferedServiceRequest offeredServiceRequest) {
+    public OfferedServiceResponse createService(OfferedServiceRequest offeredServiceRequest) {
         try {
-
             validateServiceRequest(offeredServiceRequest);
 
             OfferedService offeredService = new OfferedService();
             offeredService.setName(offeredServiceRequest.name());
             offeredService.setDescription(offeredServiceRequest.description());
             offeredService.setPrice(offeredServiceRequest.price());
+            offeredServiceRepository.save(offeredService);
 
-            return offeredServiceRepository.save(offeredService);
+            return toDto(offeredService);
 
         } catch (Exception e) {
             throw new OfferedServiceException("Service creation failed: " + e.getMessage() , e);
@@ -58,5 +59,15 @@ public class OfferedServiceService {
             throw new OfferedServiceException("Service with name '" + request.name() + "' already exists");
         }
     }
+
+    public OfferedServiceResponse toDto(OfferedService offeredService) {
+        return new OfferedServiceResponse(
+                offeredService.getId(),
+                offeredService.getName(),
+                offeredService.getDescription(),
+                offeredService.getPrice()
+        );
+    }
 }
+
 

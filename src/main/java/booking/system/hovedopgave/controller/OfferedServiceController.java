@@ -1,9 +1,10 @@
 package booking.system.hovedopgave.controller;
 
 import booking.system.hovedopgave.dto.OfferedServiceRequest;
-import booking.system.hovedopgave.model.OfferedService;
+import booking.system.hovedopgave.dto.OfferedServiceResponse;
 import booking.system.hovedopgave.service.OfferedServiceService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,28 +13,38 @@ import java.util.List;
 @RequestMapping("/api/offered-services")
 public class OfferedServiceController {
 
-    @Autowired
-    private OfferedServiceService offeredServiceService;
+    private final OfferedServiceService offeredServiceService;
+
+    public OfferedServiceController(OfferedServiceService offeredServiceService) {
+        this.offeredServiceService = offeredServiceService;
+    }
 
     @GetMapping
-    public List<OfferedService> getAllServices() {
-        return offeredServiceService.getAllServices();
+    public ResponseEntity<List<OfferedServiceResponse>> getAllServices() {
+        List<OfferedServiceResponse> responses = offeredServiceService.getAllServices().stream()
+                .map(offeredServiceService::toDto)
+                .toList();
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/{id}")
-    public OfferedService getServiceById(@PathVariable Long id) {
-        return offeredServiceService.getServiceById(id);
+    public ResponseEntity<OfferedServiceResponse> getServiceById(@PathVariable Long id) {
+        return ResponseEntity.ok(
+                offeredServiceService.toDto(offeredServiceService.getServiceById(id))
+        );
     }
 
     @PostMapping
-    public OfferedService createService(@RequestBody OfferedServiceRequest offeredServiceRequest) {
-        return offeredServiceService.createService(offeredServiceRequest);
+    public ResponseEntity<OfferedServiceResponse> createService(@RequestBody OfferedServiceRequest offeredServiceRequest) {
+        OfferedServiceResponse created = offeredServiceService.createService(offeredServiceRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteService(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteService(@PathVariable Long id) {
         offeredServiceService.deleteService(id);
+        return ResponseEntity.noContent().build();
     }
-
 }
+
 

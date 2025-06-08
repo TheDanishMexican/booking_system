@@ -1,6 +1,7 @@
 package booking.system.hovedopgave.service;
 
 import booking.system.hovedopgave.dto.OfferedServiceRequest;
+import booking.system.hovedopgave.dto.OfferedServiceResponse;
 import booking.system.hovedopgave.dto.TimeSlotRequest;
 import booking.system.hovedopgave.dto.TimeSlotResponse;
 import booking.system.hovedopgave.model.OfferedService;
@@ -32,12 +33,12 @@ public class TimeSlotServiceTest {
                 75.00
         );
 
-        OfferedService offeredService = offeredServiceService.createService(OfferedServiceRequest);
+        OfferedServiceResponse offeredService = offeredServiceService.createService(OfferedServiceRequest);
 
         TimeSlotRequest timeSlotRequest = new TimeSlotRequest(
                 LocalDateTime.now().plusDays(2),
                 LocalDateTime.now().plusDays(2).plusHours(1),
-                offeredService.getId(),
+                offeredService.id(),
                 "Room 101",
                 1
         );
@@ -45,7 +46,7 @@ public class TimeSlotServiceTest {
         TimeSlotResponse timeSlot = timeSlotService.createTimeSlot(timeSlotRequest);
 
         assertNotNull(timeSlot.id());
-        assertEquals(offeredService.getId(), timeSlot.offeredServiceId());
+        assertEquals(offeredService.id(), timeSlot.offeredServiceId());
         assertTrue(timeSlot.startTime().isBefore(timeSlot.endTime()));
     }
 
@@ -76,12 +77,12 @@ public class TimeSlotServiceTest {
                 60.00
         );
 
-       OfferedService offeredService = offeredServiceService.createService(request);
+       OfferedServiceResponse offeredService = offeredServiceService.createService(request);
 
         TimeSlotRequest timeSlotRequest = new TimeSlotRequest(
                 LocalDateTime.now().plusDays(2).plusHours(1),
                 LocalDateTime.now().plusDays(2),
-                offeredService.getId(),
+                offeredService.id(),
                 "Room 103",
                 1
         );

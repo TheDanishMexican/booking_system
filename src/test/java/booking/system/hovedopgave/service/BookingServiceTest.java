@@ -34,12 +34,12 @@ public class BookingServiceTest {
                 100.0
         );
 
-        OfferedService offeredService = offeredServiceService.createService(offeredServiceRequest);
+        OfferedServiceResponse offeredService = offeredServiceService.createService(offeredServiceRequest);
 
         TimeSlotRequest timeSlotRequest = new TimeSlotRequest(
                 LocalDateTime.now().plusDays(1),
                 LocalDateTime.now().plusDays(1).plusHours(1),
-                offeredService.getId(),
+                offeredService.id(),
                 "Test Location",
                 1
         );
@@ -87,12 +87,12 @@ public class BookingServiceTest {
                 "This is a test service",
                 100.0
         );
-        OfferedService offeredService = offeredServiceService.createService(offeredServiceRequest);
+        OfferedServiceResponse offeredService = offeredServiceService.createService(offeredServiceRequest);
 
         TimeSlotRequest timeSlotRequest = new TimeSlotRequest(
                 LocalDateTime.now().plusDays(2),
                 LocalDateTime.now().plusDays(2).plusHours(1),
-                offeredService.getId(),
+                offeredService.id(),
                 "Test Location",
                 1
         );

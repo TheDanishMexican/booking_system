@@ -21,5 +21,10 @@ public class AdminController {
     public Admin getAdminById(@PathVariable Long id) {
         return adminService.getAdminById(id);
     }
+
+    @GetMapping("/test")
+    public String testAdmin() {
+        return "Hello, admin! You are logged in.";
+    }
 }
 

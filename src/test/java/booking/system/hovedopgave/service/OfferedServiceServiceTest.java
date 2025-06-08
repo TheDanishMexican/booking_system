@@ -1,6 +1,7 @@
 package booking.system.hovedopgave.service;
 
 import booking.system.hovedopgave.dto.OfferedServiceRequest;
+import booking.system.hovedopgave.dto.OfferedServiceResponse;
 import booking.system.hovedopgave.exception.OfferedServiceException;
 import booking.system.hovedopgave.model.OfferedService;
 import org.junit.jupiter.api.Test;
@@ -24,11 +25,11 @@ public class OfferedServiceServiceTest {
                 300.0
         );
 
-        OfferedService service = offeredServiceService.createService(offeredServiceRequest);
+        OfferedServiceResponse service = offeredServiceService.createService(offeredServiceRequest);
 
-        assertNotNull(service.getId());
-        assertEquals("Aromatherapy Massage", service.getName());
-        assertEquals(300.0, service.getPrice());
+        assertNotNull(service.id());
+        assertEquals("Aromatherapy Massage", service.name());
+        assertEquals(300.0, service.price());
     }
 
     //Failure path case
