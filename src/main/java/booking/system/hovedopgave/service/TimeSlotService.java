@@ -11,6 +11,7 @@ import booking.system.hovedopgave.repository.TimeSlotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -43,7 +44,7 @@ public class TimeSlotService {
 
             TimeSlot timeSlot = new TimeSlot();
             timeSlot.setStartTime(request.startTime());
-            timeSlot.setEndTime(request.endTime());
+            timeSlot.setEndTime(calculateEndTime(request.duration(), request.startTime()));
             timeSlot.setOfferedService(service);
             timeSlot.setLocation(request.location());
             timeSlot.setMaxParticipants(request.maxParticipants());
@@ -64,8 +65,8 @@ public class TimeSlotService {
         timeSlotRepository.deleteById(id);
     }
 
-    public List<TimeSlot> getAvailableTimeSlotsByServiceId(Long serviceId) {
-        return timeSlotRepository.findAllByOfferedService_IdAndIsAvailableTrue(serviceId);
+    public List<TimeSlot> getFutureAvailableTimeSlotsByServiceId(Long serviceId) {
+        return timeSlotRepository.findAllAvailableAndFutureByServiceId(serviceId);
     }
 
     private void markAsUnavailableIfFull(TimeSlot timeSlot) {
@@ -87,8 +88,8 @@ public class TimeSlotService {
     }
 
     public void validateTimeSlotRequest(TimeSlotRequest request) {
-        if (!request.startTime().isBefore(request.endTime())) {
-            throw new TimeSlotException("Invalid time slot: start time must be before end time");
+        if (request.duration() == null || request.duration() <= 0) {
+            throw new TimeSlotException("Invalid duration: must be greater than zero");
         }
         if (request.startTime().isBefore(java.time.LocalDateTime.now())) {
             throw new TimeSlotException("Invalid time slot: start time is in the past");
@@ -108,6 +109,10 @@ public class TimeSlotService {
                 timeSlot.getIsAvailable(),
                 timeSlot.getOfferedService().getId()
         );
+    }
+
+    public LocalDateTime calculateEndTime(Integer duration, LocalDateTime startTime) {
+        return startTime.plusMinutes(duration);
     }
 }
 

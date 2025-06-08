@@ -37,8 +37,8 @@ public class TimeSlotController {
     }
 
     @GetMapping("/service/{serviceId}")
-    public ResponseEntity<List<TimeSlotResponse>> getAvailableTimeSlotsByServiceId(@PathVariable Long serviceId) {
-        List<TimeSlot> slots = timeSlotService.getAvailableTimeSlotsByServiceId(serviceId);
+    public ResponseEntity<List<TimeSlotResponse>> getFutureAvailableTimeSlotsByServiceId(@PathVariable Long serviceId) {
+        List<TimeSlot> slots = timeSlotService.getFutureAvailableTimeSlotsByServiceId(serviceId);
         List<TimeSlotResponse> responses = slots.stream()
                 .map(timeSlotService::toDto)
                 .toList();

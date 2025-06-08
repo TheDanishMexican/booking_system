@@ -3,7 +3,6 @@ package booking.system.hovedopgave.config;
 import booking.system.hovedopgave.model.*;
 import booking.system.hovedopgave.repository.*;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -31,12 +30,11 @@ public class DataInit implements CommandLineRunner {
     @Override
     public void run(String... args) {
 
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
         // Admin
         Admin admin = new Admin();
         admin.setEmail("yogamaster@email.com");
-        admin.setPassword(passwordEncoder.encode("secret"));
+        admin.setPassword("secret");
         admin.setName("Anna");
         admin = adminRepo.save(admin);
 
@@ -71,6 +69,15 @@ public class DataInit implements CommandLineRunner {
         timeSlot2.setMaxParticipants(5);
         timeSlot2.setIsAvailable(true);
         timeSlotRepo.save(timeSlot2);
+
+        TimeSlot timeSlot3 = new TimeSlot();
+        timeSlot3.setStartTime(LocalDateTime.of(2025, 6, 10, 9, 0));
+        timeSlot3.setEndTime(LocalDateTime.of(2025, 6, 10, 10, 0));
+        timeSlot3.setOfferedService(offeredService);
+        timeSlot3.setLocation("100 Main Street, Yoga Studio City");
+        timeSlot3.setMaxParticipants(1);
+        timeSlot3.setIsAvailable(true);
+        timeSlotRepo.save(timeSlot3);
 
         // Customer
         Customer customer = new Customer();

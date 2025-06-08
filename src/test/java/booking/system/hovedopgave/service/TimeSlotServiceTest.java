@@ -37,7 +37,7 @@ public class TimeSlotServiceTest {
 
         TimeSlotRequest timeSlotRequest = new TimeSlotRequest(
                 LocalDateTime.now().plusDays(2),
-                LocalDateTime.now().plusDays(2).plusHours(1),
+                90,
                 offeredService.id(),
                 "Room 101",
                 1
@@ -55,7 +55,7 @@ public class TimeSlotServiceTest {
     public void testCreateTimeSlotFailsWhenServiceIdDoesNotExist() {
         TimeSlotRequest timeSlotRequest = new TimeSlotRequest(
                 LocalDateTime.now().plusHours(1),
-                LocalDateTime.now().plusHours(2),
+                90,
                 9999L,
                 "Room 102",
                 1
@@ -68,20 +68,20 @@ public class TimeSlotServiceTest {
         assertTrue(exception.getMessage().contains("Time slot creation failed"),  "Should fail because service does not exist");
     }
 
-    //Edge case path
     @Test
-    public void testCreateTimeSlotFailsWhenStartAfterEnd() {
+    public void testCreateTimeSlotFailsWhenDurationIsNegative() {
         OfferedServiceRequest request = new OfferedServiceRequest(
                 "Yoga",
                 "Relaxing yoga session",
                 60.00
         );
 
-       OfferedServiceResponse offeredService = offeredServiceService.createService(request);
+        OfferedServiceResponse offeredService = offeredServiceService.createService(request);
+
 
         TimeSlotRequest timeSlotRequest = new TimeSlotRequest(
                 LocalDateTime.now().plusDays(2).plusHours(1),
-                LocalDateTime.now().plusDays(2),
+                -90,
                 offeredService.id(),
                 "Room 103",
                 1
@@ -91,8 +91,9 @@ public class TimeSlotServiceTest {
             timeSlotService.createTimeSlot(timeSlotRequest);
         });
 
-        assertTrue(exception.getMessage().toLowerCase().contains("start time"), "Should fail because start time is after end time");
+        assertTrue(exception.getMessage().toLowerCase().contains("duration"), "Should fail because duration is negative");
     }
+
 
 
 }

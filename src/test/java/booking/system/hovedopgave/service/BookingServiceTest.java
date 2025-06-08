@@ -38,7 +38,7 @@ public class BookingServiceTest {
 
         TimeSlotRequest timeSlotRequest = new TimeSlotRequest(
                 LocalDateTime.now().plusDays(1),
-                LocalDateTime.now().plusDays(1).plusHours(1),
+                90,
                 offeredService.id(),
                 "Test Location",
                 1
@@ -91,7 +91,7 @@ public class BookingServiceTest {
 
         TimeSlotRequest timeSlotRequest = new TimeSlotRequest(
                 LocalDateTime.now().plusDays(2),
-                LocalDateTime.now().plusDays(2).plusHours(1),
+                90,
                 offeredService.id(),
                 "Test Location",
                 1
