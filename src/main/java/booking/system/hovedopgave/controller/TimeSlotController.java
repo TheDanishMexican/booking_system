@@ -1,11 +1,10 @@
 package booking.system.hovedopgave.controller;
 
 import booking.system.hovedopgave.dto.TimeSlotRequest;
+import booking.system.hovedopgave.dto.TimeSlotResponse;
 import booking.system.hovedopgave.model.TimeSlot;
 import booking.system.hovedopgave.service.TimeSlotService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,39 +15,47 @@ import java.util.List;
 @RequestMapping("/api/timeslots")
 public class TimeSlotController {
 
-    @Autowired
-    private TimeSlotService timeSlotService;
+    private final TimeSlotService timeSlotService;
+
+    public TimeSlotController(TimeSlotService timeSlotService) {
+        this.timeSlotService = timeSlotService;
+    }
 
     @GetMapping
-    public ResponseEntity<List<TimeSlot>> getAvailableTimeSlots() {
+    public ResponseEntity<List<TimeSlotResponse>> getAllTimeSlots() {
         List<TimeSlot> slots = timeSlotService.getAllTimeSlots();
-
-        return ResponseEntity.ok()
-                .body(slots);
+        List<TimeSlotResponse> responses = slots.stream()
+                .map(timeSlotService::toDto)
+                .toList();
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/{id}")
-    public TimeSlot getTimeSlotById(@PathVariable Long id) {
-        return timeSlotService.getTimeSlotById(id);
+    public ResponseEntity<TimeSlotResponse> getTimeSlotById(@PathVariable Long id) {
+        TimeSlot slot = timeSlotService.getTimeSlotById(id);
+        return ResponseEntity.ok(timeSlotService.toDto(slot));
     }
 
     @GetMapping("/service/{serviceId}")
-    public ResponseEntity<List<TimeSlot>> getAvailableTimeSlotsByServiceId(@PathVariable Long serviceId) {
-        return ResponseEntity.ok().body(timeSlotService.getAvailableTimeSlotsByServiceId(serviceId));
+    public ResponseEntity<List<TimeSlotResponse>> getAvailableTimeSlotsByServiceId(@PathVariable Long serviceId) {
+        List<TimeSlot> slots = timeSlotService.getAvailableTimeSlotsByServiceId(serviceId);
+        List<TimeSlotResponse> responses = slots.stream()
+                .map(timeSlotService::toDto)
+                .toList();
+        return ResponseEntity.ok(responses);
     }
 
     @PostMapping
-    public ResponseEntity<TimeSlot> createTimeSlot(@Valid @RequestBody TimeSlotRequest timeSlotRequest) {
-        TimeSlot created = timeSlotService.createTimeSlot(timeSlotRequest);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(created);
+    public ResponseEntity<TimeSlotResponse> createTimeSlot(@Valid @RequestBody TimeSlotRequest timeSlotRequest) {
+        TimeSlotResponse created = timeSlotService.createTimeSlot(timeSlotRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
-
 
     @DeleteMapping("/{id}")
-    public void deleteTimeSlot(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteTimeSlot(@PathVariable Long id) {
         timeSlotService.deleteTimeSlot(id);
+        return ResponseEntity.noContent().build();
     }
 }
+
 

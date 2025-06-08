@@ -28,6 +28,9 @@ public class OfferedServiceService {
 
     public OfferedService createService(OfferedServiceRequest offeredServiceRequest) {
         try {
+
+            validateServiceRequest(offeredServiceRequest);
+
             OfferedService offeredService = new OfferedService();
             offeredService.setName(offeredServiceRequest.name());
             offeredService.setDescription(offeredServiceRequest.description());
@@ -36,7 +39,7 @@ public class OfferedServiceService {
             return offeredServiceRepository.save(offeredService);
 
         } catch (Exception e) {
-            throw new OfferedServiceException("Service creation failed: ", e);
+            throw new OfferedServiceException("Service creation failed: " + e.getMessage() , e);
         }
     }
 
@@ -47,6 +50,13 @@ public class OfferedServiceService {
         offeredServiceRepository.deleteById(id);
     }
 
-
+    public void validateServiceRequest(OfferedServiceRequest request) {
+        if (request.price() <= 0) {
+            throw new OfferedServiceException("Price must be a positive number");
+        }
+        if (offeredServiceRepository.existsByName(request.name())) {
+            throw new OfferedServiceException("Service with name '" + request.name() + "' already exists");
+        }
+    }
 }
 

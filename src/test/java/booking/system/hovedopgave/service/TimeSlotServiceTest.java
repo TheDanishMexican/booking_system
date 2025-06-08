@@ -1,6 +1,8 @@
 package booking.system.hovedopgave.service;
 
+import booking.system.hovedopgave.dto.OfferedServiceRequest;
 import booking.system.hovedopgave.dto.TimeSlotRequest;
+import booking.system.hovedopgave.dto.TimeSlotResponse;
 import booking.system.hovedopgave.model.OfferedService;
 import booking.system.hovedopgave.model.TimeSlot;
 import booking.system.hovedopgave.repository.OfferedServiceRepository;
@@ -19,36 +21,38 @@ public class TimeSlotServiceTest {
     private TimeSlotService timeSlotService;
 
     @Autowired
-    private OfferedServiceRepository offeredServiceRepository;
+    private OfferedServiceService offeredServiceService;
 
+    //Happy case path
     @Test
     public void testCreateValidTimeSlot() {
-        // Create and save an offered service
-        OfferedService service = new OfferedService();
-        service.setName("Massage");
-        service = offeredServiceRepository.save(service);
+        OfferedServiceRequest OfferedServiceRequest = new OfferedServiceRequest(
+                "Massage",
+                "Relaxing massage session",
+                75.00
+        );
 
-        // Create request
-        TimeSlotRequest request = new TimeSlotRequest(
+        OfferedService offeredService = offeredServiceService.createService(OfferedServiceRequest);
+
+        TimeSlotRequest timeSlotRequest = new TimeSlotRequest(
                 LocalDateTime.now().plusDays(2),
                 LocalDateTime.now().plusDays(2).plusHours(1),
-                service.getId(),
+                offeredService.getId(),
                 "Room 101",
                 1
         );
 
-        // Create time slot
-        TimeSlot created = timeSlotService.createTimeSlot(request);
+        TimeSlotResponse timeSlot = timeSlotService.createTimeSlot(timeSlotRequest);
 
-        // Assertions
-        assertNotNull(created.getId());
-        assertEquals(service.getId(), created.getOfferedService().getId());
-        assertTrue(created.getStartTime().isBefore(created.getEndTime()));
+        assertNotNull(timeSlot.id());
+        assertEquals(offeredService.getId(), timeSlot.offeredServiceId());
+        assertTrue(timeSlot.startTime().isBefore(timeSlot.endTime()));
     }
 
+    //Failure case path
     @Test
-    public void testCreateTimeSlotFailsWhenServiceIsMissing() {
-        TimeSlotRequest request = new TimeSlotRequest(
+    public void testCreateTimeSlotFailsWhenServiceIdDoesNotExist() {
+        TimeSlotRequest timeSlotRequest = new TimeSlotRequest(
                 LocalDateTime.now().plusHours(1),
                 LocalDateTime.now().plusHours(2),
                 9999L,
@@ -57,11 +61,38 @@ public class TimeSlotServiceTest {
         );
 
         Exception exception = assertThrows(RuntimeException.class, () -> {
-            timeSlotService.createTimeSlot(request);
+            timeSlotService.createTimeSlot(timeSlotRequest);
         });
 
-        assertTrue(exception.getMessage().contains("Time slot creation failed"));
+        assertTrue(exception.getMessage().contains("Time slot creation failed"),  "Should fail because service does not exist");
     }
+
+    //Edge case path
+    @Test
+    public void testCreateTimeSlotFailsWhenStartAfterEnd() {
+        OfferedServiceRequest request = new OfferedServiceRequest(
+                "Yoga",
+                "Relaxing yoga session",
+                60.00
+        );
+
+       OfferedService offeredService = offeredServiceService.createService(request);
+
+        TimeSlotRequest timeSlotRequest = new TimeSlotRequest(
+                LocalDateTime.now().plusDays(2).plusHours(1),
+                LocalDateTime.now().plusDays(2),
+                offeredService.getId(),
+                "Room 103",
+                1
+        );
+
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            timeSlotService.createTimeSlot(timeSlotRequest);
+        });
+
+        assertTrue(exception.getMessage().toLowerCase().contains("start time"), "Should fail because start time is after end time");
+    }
+
 
 }
 

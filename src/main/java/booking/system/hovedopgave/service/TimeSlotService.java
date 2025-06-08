@@ -1,6 +1,7 @@
 package booking.system.hovedopgave.service;
 
 import booking.system.hovedopgave.dto.TimeSlotRequest;
+import booking.system.hovedopgave.dto.TimeSlotResponse;
 import booking.system.hovedopgave.exception.BookingException;
 import booking.system.hovedopgave.exception.TimeSlotException;
 import booking.system.hovedopgave.model.OfferedService;
@@ -15,12 +16,15 @@ import java.util.List;
 @Service
 public class TimeSlotService {
 
-    @Autowired
-    private TimeSlotRepository timeSlotRepository;
-    @Autowired
-    private OfferedServiceService offeredServiceService;
-    @Autowired
-    private BookingRepository bookingRepository;
+    private final TimeSlotRepository timeSlotRepository;
+    private final OfferedServiceService offeredServiceService;
+    private final BookingRepository bookingRepository;
+
+    public TimeSlotService(TimeSlotRepository timeSlotRepository, OfferedServiceService offeredServiceService, BookingRepository bookingRepository) {
+        this.timeSlotRepository = timeSlotRepository;
+        this.offeredServiceService = offeredServiceService;
+        this.bookingRepository = bookingRepository;
+    }
 
     public List<TimeSlot> getAllTimeSlots() {
         return timeSlotRepository.findAll();
@@ -31,9 +35,11 @@ public class TimeSlotService {
                 .orElseThrow(() -> new TimeSlotException("TimeSlot not found with id: " + id));
     }
 
-    public TimeSlot createTimeSlot(TimeSlotRequest request) {
+    public TimeSlotResponse createTimeSlot(TimeSlotRequest request) {
         try {
             OfferedService service = offeredServiceService.getServiceById(request.offeredServiceId());
+
+            validateTimeSlotRequest(request);
 
             TimeSlot timeSlot = new TimeSlot();
             timeSlot.setStartTime(request.startTime());
@@ -42,10 +48,12 @@ public class TimeSlotService {
             timeSlot.setLocation(request.location());
             timeSlot.setMaxParticipants(request.maxParticipants());
             timeSlot.setIsAvailable(true);
-            return timeSlotRepository.save(timeSlot);
+            timeSlot = timeSlotRepository.save(timeSlot);
+
+            return toDto(timeSlot);
 
         } catch (Exception e) {
-            throw new TimeSlotException("Time slot creation failed: ", e);
+            throw new TimeSlotException("Time slot creation failed: " + e.getMessage(), e);
         }
     }
 
@@ -78,5 +86,28 @@ public class TimeSlotService {
         }
     }
 
+    public void validateTimeSlotRequest(TimeSlotRequest request) {
+        if (!request.startTime().isBefore(request.endTime())) {
+            throw new TimeSlotException("Invalid time slot: start time must be before end time");
+        }
+        if (request.startTime().isBefore(java.time.LocalDateTime.now())) {
+            throw new TimeSlotException("Invalid time slot: start time is in the past");
+        }
+        if (request.maxParticipants() <= 0) {
+            throw new TimeSlotException("Invalid number of participants: must be greater than zero");
+        }
+    }
+
+    public TimeSlotResponse toDto(TimeSlot timeSlot) {
+        return new TimeSlotResponse(
+                timeSlot.getId(),
+                timeSlot.getStartTime(),
+                timeSlot.getEndTime(),
+                timeSlot.getLocation(),
+                timeSlot.getMaxParticipants(),
+                timeSlot.getIsAvailable(),
+                timeSlot.getOfferedService().getId()
+        );
+    }
 }
 

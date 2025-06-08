@@ -1,8 +1,6 @@
 package booking.system.hovedopgave.service;
 
-import booking.system.hovedopgave.dto.BookingRequest;
-import booking.system.hovedopgave.dto.OfferedServiceRequest;
-import booking.system.hovedopgave.dto.TimeSlotRequest;
+import booking.system.hovedopgave.dto.*;
 import booking.system.hovedopgave.exception.BookingException;
 import booking.system.hovedopgave.model.*;
 import booking.system.hovedopgave.repository.*;
@@ -47,21 +45,21 @@ public class BookingServiceTest {
         );
 
 
-        TimeSlot timeSlot = timeSlotService.createTimeSlot(timeSlotRequest);
+        TimeSlotResponse timeSlot = timeSlotService.createTimeSlot(timeSlotRequest);
 
         BookingRequest bookingRequest = new BookingRequest(
                 "test@example.com",
                 "Daniel",
                 "12345678",
-                timeSlot.getId()
+                timeSlot.id()
         );
 
-        Booking booking = bookingService.createBooking(bookingRequest);
+        BookingResponse booking = bookingService.createBooking(bookingRequest);
 
-        assertNotNull(booking.getId());
-        assertEquals("Daniel", booking.getName());
-        assertEquals("test@example.com", booking.getEmail());
-        assertEquals(timeSlot.getId(), booking.getTimeSlot().getId());
+        assertNotNull(booking.id());
+        assertEquals("Daniel", booking.name());
+        assertEquals("test@example.com", booking.email());
+        assertEquals(timeSlot.id(), booking.timeSlotId());
     }
 
     //Failure case path
@@ -85,7 +83,7 @@ public class BookingServiceTest {
     @Test
     public void testCreateBookingFailsWhenTimeSlotIsFull() {
         OfferedServiceRequest offeredServiceRequest = new OfferedServiceRequest(
-                "Test Service",
+                "Test Service1",
                 "This is a test service",
                 100.0
         );
@@ -98,13 +96,13 @@ public class BookingServiceTest {
                 "Test Location",
                 1
         );
-        TimeSlot timeSlot = timeSlotService.createTimeSlot(timeSlotRequest);
+        TimeSlotResponse timeSlot = timeSlotService.createTimeSlot(timeSlotRequest);
 
         BookingRequest bookingRequest1 = new BookingRequest(
                 "test1@example.com",
                 "Daniel",
                 "12345678",
-                timeSlot.getId()
+                timeSlot.id()
         );
         bookingService.createBooking(bookingRequest1);
 
@@ -112,7 +110,7 @@ public class BookingServiceTest {
                 "test2@example.com",
                 "Anna",
                 "87654321",
-                timeSlot.getId()
+                timeSlot.id()
         );
 
         Exception exception = assertThrows(BookingException.class, () -> bookingService.createBooking(bookingRequest2));
