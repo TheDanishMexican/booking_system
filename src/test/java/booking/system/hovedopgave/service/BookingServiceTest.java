@@ -59,7 +59,7 @@ public class BookingServiceTest {
         assertNotNull(booking.id());
         assertEquals("Daniel", booking.name());
         assertEquals("test@example.com", booking.email());
-        assertEquals(timeSlot.id(), booking.timeSlotId());
+        assertEquals(timeSlot.id(), booking.timeSlot().id());
     }
 
     //Failure case path

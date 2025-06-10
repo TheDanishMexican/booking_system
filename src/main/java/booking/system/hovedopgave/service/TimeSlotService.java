@@ -12,8 +12,11 @@ import booking.system.hovedopgave.repository.TimeSlotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TimeSlotService {
@@ -28,8 +31,11 @@ public class TimeSlotService {
         this.bookingRepository = bookingRepository;
     }
 
-    public List<TimeSlot> getAllTimeSlots() {
-        return timeSlotRepository.findAll();
+    public List<TimeSlotResponse> getAllFutureTimeSlots() {
+        List<TimeSlot> slots = timeSlotRepository.findByStartTimeAfter(LocalDateTime.now());
+        return slots.stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 
     public TimeSlot getTimeSlotById(Long id) {
@@ -64,10 +70,6 @@ public class TimeSlotService {
             throw new TimeSlotException("TimeSlot with ID " + id + " does not exist");
         }
         timeSlotRepository.deleteById(id);
-    }
-
-    public List<TimeSlot> getFutureAvailableTimeSlotsByServiceId(Long serviceId) {
-        return timeSlotRepository.findAllAvailableAndFutureByServiceId(serviceId);
     }
 
     private void markAsUnavailableIfFull(TimeSlot timeSlot) {
@@ -122,6 +124,20 @@ public class TimeSlotService {
 
     public LocalDateTime calculateEndTime(Integer duration, LocalDateTime startTime) {
         return startTime.plusMinutes(duration);
+    }
+
+    public List<TimeSlotResponse> getAvailableTimeSlotsByServiceIdAndDate(Long serviceId, LocalDate date) {
+        LocalDateTime startOfDay = date.atStartOfDay();
+        LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();
+        List<TimeSlot> slots = timeSlotRepository.findAvailableByServiceIdAndDate(serviceId, startOfDay, endOfDay);
+        return slots.stream().map(this::toDto).collect(Collectors.toList());
+    }
+
+    public List<TimeSlotResponse> getPastTimeSlots() {
+        List<TimeSlot> slots = timeSlotRepository.findByStartTimeBefore(LocalDateTime.now());
+        return slots.stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 }
 
