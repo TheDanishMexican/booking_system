@@ -53,8 +53,8 @@ public class DataInit implements CommandLineRunner {
 
         // TimeSlot
         TimeSlot timeSlot = new TimeSlot();
-        timeSlot.setStartTime(LocalDateTime.of(2025, 6, 1, 10, 0));
-        timeSlot.setEndTime(LocalDateTime.of(2025, 6, 1, 11, 0));
+        timeSlot.setStartTime(LocalDateTime.of(2025, 6, 19, 10, 0));
+        timeSlot.setEndTime(LocalDateTime.of(2025, 6, 19, 11, 0));
         timeSlot.setOfferedService(offeredService);
         timeSlot.setLocation("100 Main Street, Yoga Studio City");
         timeSlot.setMaxParticipants(1);
@@ -62,8 +62,8 @@ public class DataInit implements CommandLineRunner {
         timeSlotRepo.save(timeSlot);
 
         TimeSlot timeSlot2 = new TimeSlot();
-        timeSlot2.setStartTime(LocalDateTime.of(2025, 6, 3, 11, 0));
-        timeSlot2.setEndTime(LocalDateTime.of(2025, 6, 3, 12, 0));
+        timeSlot2.setStartTime(LocalDateTime.of(2025, 6, 30, 11, 0));
+        timeSlot2.setEndTime(LocalDateTime.of(2025, 6, 30, 12, 0));
         timeSlot2.setOfferedService(offeredService2);
         timeSlot2.setLocation("100 Main Street, Yoga Studio City");
         timeSlot2.setMaxParticipants(5);
@@ -71,8 +71,8 @@ public class DataInit implements CommandLineRunner {
         timeSlotRepo.save(timeSlot2);
 
         TimeSlot timeSlot3 = new TimeSlot();
-        timeSlot3.setStartTime(LocalDateTime.of(2025, 6, 10, 9, 0));
-        timeSlot3.setEndTime(LocalDateTime.of(2025, 6, 10, 10, 0));
+        timeSlot3.setStartTime(LocalDateTime.of(2025, 6, 17, 9, 0));
+        timeSlot3.setEndTime(LocalDateTime.of(2025, 6, 17, 10, 0));
         timeSlot3.setOfferedService(offeredService);
         timeSlot3.setLocation("100 Main Street, Yoga Studio City");
         timeSlot3.setMaxParticipants(1);
