@@ -5,7 +5,7 @@ public record BookingResponse(
         String name,
         String email,
         String phone,
-        Long timeSlotId,
+        TimeSlotResponse timeSlot,
         String status,
         Boolean paid
 ) {}

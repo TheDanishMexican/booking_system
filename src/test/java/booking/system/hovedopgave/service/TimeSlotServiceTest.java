@@ -46,7 +46,7 @@ public class TimeSlotServiceTest {
         TimeSlotResponse timeSlot = timeSlotService.createTimeSlot(timeSlotRequest);
 
         assertNotNull(timeSlot.id());
-        assertEquals(offeredService.id(), timeSlot.offeredServiceId());
+        assertEquals(offeredService.id(), timeSlot.offeredService().id());
         assertTrue(timeSlot.startTime().isBefore(timeSlot.endTime()));
     }
 

@@ -1,5 +1,6 @@
 package booking.system.hovedopgave.service;
 
+import booking.system.hovedopgave.dto.OfferedServiceResponse;
 import booking.system.hovedopgave.dto.TimeSlotRequest;
 import booking.system.hovedopgave.dto.TimeSlotResponse;
 import booking.system.hovedopgave.exception.BookingException;
@@ -81,6 +82,12 @@ public class TimeSlotService {
         }
     }
 
+    public void setTimeSlotAvailable(Long timeSlotId) {
+        TimeSlot timeSlot = getTimeSlotById(timeSlotId);
+        timeSlot.setIsAvailable(true);
+        timeSlotRepository.save(timeSlot);
+    }
+
     public void checkTimeSlotAvailability(TimeSlot timeSlot) {
         if (!timeSlot.getIsAvailable()) {
             throw new TimeSlotException("Time slot full, not available for booking");
@@ -100,6 +107,8 @@ public class TimeSlotService {
     }
 
     public TimeSlotResponse toDto(TimeSlot timeSlot) {
+        OfferedServiceResponse offeredServiceResponse = offeredServiceService.toDto(timeSlot.getOfferedService());
+
         return new TimeSlotResponse(
                 timeSlot.getId(),
                 timeSlot.getStartTime(),
@@ -107,7 +116,7 @@ public class TimeSlotService {
                 timeSlot.getLocation(),
                 timeSlot.getMaxParticipants(),
                 timeSlot.getIsAvailable(),
-                timeSlot.getOfferedService().getId()
+                offeredServiceResponse
         );
     }
 

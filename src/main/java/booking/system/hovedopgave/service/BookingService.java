@@ -2,6 +2,7 @@ package booking.system.hovedopgave.service;
 
 import booking.system.hovedopgave.dto.BookingRequest;
 import booking.system.hovedopgave.dto.BookingResponse;
+import booking.system.hovedopgave.dto.TimeSlotResponse;
 import booking.system.hovedopgave.exception.BookingException;
 import booking.system.hovedopgave.model.*;
 import booking.system.hovedopgave.repository.BookingRepository;
@@ -36,7 +37,7 @@ public class BookingService {
             booking.setName(request.name());
             booking.setPhone(request.phone());
             booking.setTimeSlot(timeSlot);
-            booking.setStatus(BookingStatus.CONFIRMED);
+            booking.setStatus(BookingStatus.PENDING);
             booking.setPaid(true);
             booking = bookingRepository.save(booking);
 
@@ -54,9 +55,9 @@ public class BookingService {
     }
 
     public void deleteBooking(Long id) {
-        if (!bookingRepository.existsById(id)) {
-            throw new BookingException("Booking with ID " + id + " does not exist");
-        }
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new BookingException("Booking with ID " + id + " does not exist"));
+        timeSlotService.setTimeSlotAvailable(booking.getTimeSlot().getId());
         bookingRepository.deleteById(id);
     }
 
@@ -67,12 +68,14 @@ public class BookingService {
     }
 
     public BookingResponse toDto(Booking booking) {
+       TimeSlotResponse timeSlotResponse = timeSlotService.toDto(booking.getTimeSlot());
+
         return new BookingResponse(
                 booking.getId(),
                 booking.getName(),
                 booking.getEmail(),
                 booking.getPhone(),
-                booking.getTimeSlot().getId(),
+                timeSlotResponse,
                 booking.getStatus().name(),
                 booking.isPaid()
         );

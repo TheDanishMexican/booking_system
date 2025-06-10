@@ -9,6 +9,6 @@ public record TimeSlotResponse(
         String location,
         Integer maxParticipants,
         Boolean isAvailable,
-        Long offeredServiceId
+        OfferedServiceResponse offeredService
 ) {}
 
