@@ -5,6 +5,7 @@ import booking.system.hovedopgave.dto.OfferedServiceResponse;
 import booking.system.hovedopgave.exception.OfferedServiceException;
 import booking.system.hovedopgave.model.OfferedService;
 import booking.system.hovedopgave.repository.OfferedServiceRepository;
+import booking.system.hovedopgave.repository.TimeSlotRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,9 +14,11 @@ import java.util.List;
 public class OfferedServiceService {
 
     private final OfferedServiceRepository offeredServiceRepository;
+    private final TimeSlotRepository timeSlotRepository;
 
-    public OfferedServiceService(OfferedServiceRepository offeredServiceRepository) {
+    public OfferedServiceService(OfferedServiceRepository offeredServiceRepository, TimeSlotRepository timeSlotRepository) {
         this.offeredServiceRepository = offeredServiceRepository;
+        this.timeSlotRepository = timeSlotRepository;
     }
 
     public List<OfferedService> getAllServices() {
@@ -44,9 +47,13 @@ public class OfferedServiceService {
         }
     }
 
+    //Had to use the TimeSlotRepository directly to avoid circular dependency issues
     public void deleteService(Long id) {
         if (!offeredServiceRepository.existsById(id)) {
             throw new OfferedServiceException("Service with ID " + id + " does not exist");
+        }
+        if (timeSlotRepository.existsByOfferedServiceId(id)) {
+            throw new OfferedServiceException("Cannot delete service with ID " + id + " because it has associated time slots");
         }
         offeredServiceRepository.deleteById(id);
     }

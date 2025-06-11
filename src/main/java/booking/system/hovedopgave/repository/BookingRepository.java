@@ -11,4 +11,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Long countByTimeSlotId(Long timeSlotId);
 
     Boolean existsByEmailAndTimeSlotId(String email, Long id);
+
+    Boolean existsByTimeSlotId(Long timeSlotId);
 }

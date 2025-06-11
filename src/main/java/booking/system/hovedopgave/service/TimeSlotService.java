@@ -43,8 +43,18 @@ public class TimeSlotService {
                 .orElseThrow(() -> new TimeSlotException("TimeSlot not found with id: " + id));
     }
 
+    public void checkNoOverlappingTimeSlot(TimeSlotRequest request) {
+        LocalDateTime startTime = request.startTime();
+        LocalDateTime endTime = calculateEndTime(request.duration(), startTime);
+        if(timeSlotRepository.existsOverlappingTimeSlot(startTime, endTime)){
+            throw new TimeSlotException("Time slot overlaps with an existing time slot");
+        }
+    }
+
     public TimeSlotResponse createTimeSlot(TimeSlotRequest request) {
         try {
+            checkNoOverlappingTimeSlot(request);
+
             OfferedService service = offeredServiceService.getServiceById(request.offeredServiceId());
 
             validateTimeSlotRequest(request);
@@ -68,6 +78,9 @@ public class TimeSlotService {
     public void deleteTimeSlot(Long id) {
         if (!timeSlotRepository.existsById(id)) {
             throw new TimeSlotException("TimeSlot with ID " + id + " does not exist");
+        }
+        if (bookingRepository.existsByTimeSlotId(id)) {
+            throw new BookingException("Cannot delete TimeSlot with ID " + id + " because it has bookings");
         }
         timeSlotRepository.deleteById(id);
     }

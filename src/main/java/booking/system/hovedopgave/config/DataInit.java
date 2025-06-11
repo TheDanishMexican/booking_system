@@ -13,18 +13,15 @@ public class DataInit implements CommandLineRunner {
     private final AdminRepository adminRepo;
     private final OfferedServiceRepository offeredServiceRepo;
     private final TimeSlotRepository timeSlotRepo;
-    private final CustomerRepository customerRepo;
 
     public DataInit(
             AdminRepository adminRepo,
             OfferedServiceRepository offeredServiceRepo,
-            TimeSlotRepository timeSlotRepo,
-            CustomerRepository customerRepo
+            TimeSlotRepository timeSlotRepo
     ) {
         this.adminRepo = adminRepo;
         this.offeredServiceRepo = offeredServiceRepo;
         this.timeSlotRepo = timeSlotRepo;
-        this.customerRepo = customerRepo;
     }
 
     @Override
@@ -79,14 +76,8 @@ public class DataInit implements CommandLineRunner {
         timeSlot3.setIsAvailable(true);
         timeSlotRepo.save(timeSlot3);
 
-        // Customer
-        Customer customer = new Customer();
-        customer.setName("John Doe");
-        customer.setEmail("john@example.com");
-        customer.setPhone("12345678");
-        customerRepo.save(customer);
 
-        System.out.println("✅ Admin, Service, TimeSlot, and Customer created.");
+        System.out.println("✅ Test data created successfully!");
     }
 }
 

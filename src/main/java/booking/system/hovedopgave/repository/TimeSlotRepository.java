@@ -21,4 +21,16 @@ public interface TimeSlotRepository extends JpaRepository<TimeSlot, Long> {
     List<TimeSlot> findByStartTimeAfter(LocalDateTime now);
 
     List<TimeSlot> findByStartTimeBefore(LocalDateTime now);
+
+    Boolean existsByOfferedServiceId(Long id);
+
+    @Query("""
+SELECT CASE WHEN COUNT(t) > 0 THEN true ELSE false END
+    FROM TimeSlot t
+    WHERE t.startTime < :endTime
+      AND t.endTime > :startTime
+""")
+    boolean existsOverlappingTimeSlot(@Param("startTime") LocalDateTime startTime,
+                                      @Param("endTime") LocalDateTime endTime);
+
 }
