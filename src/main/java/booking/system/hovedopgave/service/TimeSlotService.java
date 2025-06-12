@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -124,16 +126,21 @@ public class TimeSlotService {
     public TimeSlotResponse toDto(TimeSlot timeSlot) {
         OfferedServiceResponse offeredServiceResponse = offeredServiceService.toDto(timeSlot.getOfferedService());
 
+        // Convert LocalDateTime to OffsetDateTime as UTC
+        OffsetDateTime startTime = timeSlot.getStartTime().atOffset(ZoneOffset.UTC);
+        OffsetDateTime endTime = timeSlot.getEndTime().atOffset(ZoneOffset.UTC);
+
         return new TimeSlotResponse(
                 timeSlot.getId(),
-                timeSlot.getStartTime(),
-                timeSlot.getEndTime(),
+                startTime,
+                endTime,
                 timeSlot.getLocation(),
                 timeSlot.getMaxParticipants(),
                 timeSlot.getIsAvailable(),
                 offeredServiceResponse
         );
     }
+
 
     public LocalDateTime calculateEndTime(Integer duration, LocalDateTime startTime) {
         return startTime.plusMinutes(duration);

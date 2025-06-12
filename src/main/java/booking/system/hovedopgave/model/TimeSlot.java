@@ -17,8 +17,12 @@ public class TimeSlot {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // These fields store date and time values representing UTC instants.
+    // LocalDateTime itself does not hold timezone info, but the system treats these as UTC based on frontend input.
+    // When sending data via the API, these values are converted to OffsetDateTime with explicit UTC offset to ensure clarity.
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+
     private String location;
     private Integer maxParticipants;
     private Boolean isAvailable;
