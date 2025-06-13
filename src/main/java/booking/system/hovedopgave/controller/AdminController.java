@@ -3,6 +3,8 @@ package booking.system.hovedopgave.controller;
 import booking.system.hovedopgave.model.Admin;
 import booking.system.hovedopgave.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,9 +24,11 @@ public class AdminController {
         return adminService.getAdminById(id);
     }
 
-    @GetMapping("/test")
-    public String testAdmin() {
-        return "Hello, admin! You are logged in.";
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/auth-check")
+    public ResponseEntity<String> authCheck() {
+        return ResponseEntity.ok("Authenticated");
     }
+
 }
 

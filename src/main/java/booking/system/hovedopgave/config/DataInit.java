@@ -3,6 +3,7 @@ package booking.system.hovedopgave.config;
 import booking.system.hovedopgave.model.*;
 import booking.system.hovedopgave.repository.*;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -13,15 +14,18 @@ public class DataInit implements CommandLineRunner {
     private final AdminRepository adminRepo;
     private final OfferedServiceRepository offeredServiceRepo;
     private final TimeSlotRepository timeSlotRepo;
+    private final PasswordEncoder passwordEncoder;
 
     public DataInit(
             AdminRepository adminRepo,
             OfferedServiceRepository offeredServiceRepo,
             TimeSlotRepository timeSlotRepo
+            , PasswordEncoder passwordEncoder
     ) {
         this.adminRepo = adminRepo;
         this.offeredServiceRepo = offeredServiceRepo;
         this.timeSlotRepo = timeSlotRepo;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -31,7 +35,7 @@ public class DataInit implements CommandLineRunner {
         // Admin
         Admin admin = new Admin();
         admin.setEmail("yogamaster@email.com");
-        admin.setPassword("secret");
+        admin.setPassword(passwordEncoder.encode("secret"));
         admin.setName("Anna");
         admin = adminRepo.save(admin);
 
