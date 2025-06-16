@@ -24,7 +24,6 @@ public class AdminController {
         return adminService.getAdminById(id);
     }
 
-    @PreAuthorize("isAuthenticated()")
     @GetMapping("/auth-check")
     public ResponseEntity<String> authCheck() {
         return ResponseEntity.ok("Authenticated");
