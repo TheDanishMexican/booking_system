@@ -37,6 +37,10 @@ public class AdminDetails implements UserDetails {
         return admin.getEmail();
     }
 
+    public Long getId() {
+        return admin.getId();
+    }
+
     // The following four methods define account status flags.
     // For now, we just return true for all of them.
 
@@ -62,5 +66,9 @@ public class AdminDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public Admin getAdmin() {
+        return this.admin;
     }
 }

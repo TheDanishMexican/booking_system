@@ -43,6 +43,7 @@ public class SecurityConfig {
                         // Public POST endpoint for making bookings
                         .requestMatchers(HttpMethod.POST, "/api/bookings").permitAll()
                         // Everything else must be authenticated
+                        .requestMatchers(HttpMethod.POST, "/api/admin").permitAll() // Allow creating admin via POST
                         .anyRequest().authenticated()
                 )
 

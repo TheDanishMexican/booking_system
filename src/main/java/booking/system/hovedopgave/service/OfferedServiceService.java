@@ -6,6 +6,8 @@ import booking.system.hovedopgave.exception.OfferedServiceException;
 import booking.system.hovedopgave.model.OfferedService;
 import booking.system.hovedopgave.repository.OfferedServiceRepository;
 import booking.system.hovedopgave.repository.TimeSlotRepository;
+import booking.system.hovedopgave.security.AdminDetails;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,10 +17,20 @@ public class OfferedServiceService {
 
     private final OfferedServiceRepository offeredServiceRepository;
     private final TimeSlotRepository timeSlotRepository;
+    private final AdminService adminService;
 
-    public OfferedServiceService(OfferedServiceRepository offeredServiceRepository, TimeSlotRepository timeSlotRepository) {
+    public OfferedServiceService(OfferedServiceRepository offeredServiceRepository, TimeSlotRepository timeSlotRepository, AdminService adminService) {
         this.offeredServiceRepository = offeredServiceRepository;
         this.timeSlotRepository = timeSlotRepository;
+        this.adminService = adminService;
+    }
+
+    public List<OfferedServiceResponse> getServicesForCurrentAdmin() {
+        Long adminId = adminService.getCurrentAuthenticatedAdminId();
+        List<OfferedService> services = offeredServiceRepository.findByAdminId(adminId);
+        return services.stream()
+                .map(this::toDto)
+                .toList();
     }
 
     public List<OfferedService> getAllServices() {

@@ -44,12 +44,14 @@ public class DataInit implements CommandLineRunner {
         offeredService.setName("Private Yoga");
         offeredService.setDescription("1-on-1 session");
         offeredService.setPrice(300.0);
+        offeredService.setAdmin(admin); // Associate the service with the admin
         offeredService = offeredServiceRepo.save(offeredService);
 
         OfferedService offeredService2 = new OfferedService();
         offeredService2.setName("Group Yoga");
         offeredService2.setDescription("Group session for up to 5 people");
         offeredService2.setPrice(150.0);
+        offeredService2.setAdmin(admin); // Associate the service with the admin
         offeredService2 = offeredServiceRepo.save(offeredService2);
 
         // TimeSlot

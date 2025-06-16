@@ -19,6 +19,12 @@ public class OfferedServiceController {
         this.offeredServiceService = offeredServiceService;
     }
 
+    @GetMapping("/admin")
+    public ResponseEntity<List<OfferedServiceResponse>> getServicesForCurrentAdmin() {
+        List<OfferedServiceResponse> responses = offeredServiceService.getServicesForCurrentAdmin();
+        return ResponseEntity.ok(responses);
+    }
+
     @GetMapping
     public ResponseEntity<List<OfferedServiceResponse>> getAllServices() {
         List<OfferedServiceResponse> responses = offeredServiceService.getAllServices().stream()
