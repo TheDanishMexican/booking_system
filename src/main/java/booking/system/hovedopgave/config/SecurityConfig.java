@@ -44,6 +44,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/admin/names").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/offered-services").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/admin/auth-check").permitAll()
+                        .anyRequest().authenticated()
                 )
 
                 // Configure form-based login (used by the frontend to log in via POST to /login)
