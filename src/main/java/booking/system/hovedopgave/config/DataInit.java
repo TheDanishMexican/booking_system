@@ -36,7 +36,7 @@ public class DataInit implements CommandLineRunner {
         Admin admin = new Admin();
         admin.setEmail("yogamaster@email.com");
         admin.setPassword(passwordEncoder.encode("secret"));
-        admin.setName("Anna");
+        admin.setName("Anna Lastname");
         admin = adminRepo.save(admin);
 
         Admin admin2 = new Admin();
@@ -44,6 +44,21 @@ public class DataInit implements CommandLineRunner {
         admin2.setPassword(passwordEncoder.encode("test123"));
         admin2.setName("Test Admin");
         admin2 = adminRepo.save(admin2);
+
+        Admin admin3 = new Admin();
+        admin3.setEmail("daniel@email.com");
+        admin3.setPassword(passwordEncoder.encode("daniel123"));
+        admin3.setName("Daniel Lastname");
+        admin3 = adminRepo.save(admin3);
+
+        // OfferedService (admin3)
+
+        OfferedService offeredService4 = new OfferedService();
+        offeredService4.setName("Advanced Yoga");
+        offeredService4.setDescription("Advanced yoga techniques for experienced practitioners");
+        offeredService4.setPrice(400.0);
+        offeredService4.setAdmin(admin3); // Associate the service with the admin3
+        offeredService4 = offeredServiceRepo.save(offeredService4);
 
         // service (admin2)
 
