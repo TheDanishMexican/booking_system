@@ -1,5 +1,6 @@
 package booking.system.hovedopgave.service;
 
+import booking.system.hovedopgave.dto.AdminSummaryRequest;
 import booking.system.hovedopgave.model.Admin;
 import booking.system.hovedopgave.repository.AdminRepository;
 import booking.system.hovedopgave.security.AdminDetails;
@@ -7,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class AdminService {
@@ -37,6 +40,10 @@ public AdminService(AdminRepository adminRepository, PasswordEncoder passwordEnc
         }
 
         throw new RuntimeException("Could not identify authenticated admin");
+    }
+
+    public List<AdminSummaryRequest> getAllAdminSummaries() {
+        return adminRepository.findAllAdminSummaries();
     }
 
 }

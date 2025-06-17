@@ -37,14 +37,13 @@ public class SecurityConfig {
 
                 // Define which endpoints are public and which require authentication
                 .authorizeHttpRequests(auth -> auth
-                        // Public GET endpoints
                         .requestMatchers(HttpMethod.GET, "/api/offered-services").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/timeslots/service/{serviceId}").permitAll()
-                        // Public POST endpoint for making bookings
                         .requestMatchers(HttpMethod.POST, "/api/bookings").permitAll()
-                        // Everything else must be authenticated
-                        .requestMatchers(HttpMethod.POST, "/api/admin").permitAll() // Allow creating admin via POST
-                        .anyRequest().authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/admin").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/admin/names").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/offered-services").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/admin/auth-check").permitAll()
                 )
 
                 // Configure form-based login (used by the frontend to log in via POST to /login)

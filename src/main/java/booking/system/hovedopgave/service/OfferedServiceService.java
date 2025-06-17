@@ -106,6 +106,16 @@ public class OfferedServiceService {
                 offeredService.getAdmin().getId()
         );
     }
+
+    public List<OfferedServiceResponse> getServicesByTeacherId(Long adminId) {
+        List<OfferedService> services = offeredServiceRepository.findByAdminId(adminId);
+        if (services.isEmpty()) {
+            throw new OfferedServiceException("No services found for admin with ID: " + adminId);
+        }
+        return services.stream()
+                .map(this::toDto)
+                .toList();
+    }
 }
 
 

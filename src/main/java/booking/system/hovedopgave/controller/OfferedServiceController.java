@@ -19,19 +19,26 @@ public class OfferedServiceController {
         this.offeredServiceService = offeredServiceService;
     }
 
+    @GetMapping
+    public ResponseEntity<List<OfferedServiceResponse>> getServicesByAdminId(@RequestParam Long adminId) {
+        List<OfferedServiceResponse> responses = offeredServiceService.getServicesByTeacherId(adminId);
+        return ResponseEntity.ok(responses);
+    }
+
+
     @GetMapping("/admin")
     public ResponseEntity<List<OfferedServiceResponse>> getServicesForCurrentAdmin() {
         List<OfferedServiceResponse> responses = offeredServiceService.getServicesForCurrentAdmin();
         return ResponseEntity.ok(responses);
     }
 
-    @GetMapping
-    public ResponseEntity<List<OfferedServiceResponse>> getAllServices() {
-        List<OfferedServiceResponse> responses = offeredServiceService.getAllServices().stream()
-                .map(offeredServiceService::toDto)
-                .toList();
-        return ResponseEntity.ok(responses);
-    }
+//    @GetMapping
+//    public ResponseEntity<List<OfferedServiceResponse>> getAllServices() {
+//        List<OfferedServiceResponse> responses = offeredServiceService.getAllServices().stream()
+//                .map(offeredServiceService::toDto)
+//                .toList();
+//        return ResponseEntity.ok(responses);
+//    }
 
     @GetMapping("/{id}")
     public ResponseEntity<OfferedServiceResponse> getServiceById(@PathVariable Long id) {
