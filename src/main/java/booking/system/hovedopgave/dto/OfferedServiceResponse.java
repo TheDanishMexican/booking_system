@@ -4,5 +4,6 @@ public record OfferedServiceResponse(
         Long id,
         String name,
         String description,
-        Double price
+        Double price,
+        Long adminId
 ) {}

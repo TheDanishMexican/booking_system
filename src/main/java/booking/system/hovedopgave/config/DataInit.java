@@ -39,7 +39,23 @@ public class DataInit implements CommandLineRunner {
         admin.setName("Anna");
         admin = adminRepo.save(admin);
 
-        // Service
+        Admin admin2 = new Admin();
+        admin2.setEmail("test@email.com");
+        admin2.setPassword(passwordEncoder.encode("test123"));
+        admin2.setName("Test Admin");
+        admin2 = adminRepo.save(admin2);
+
+        // service (admin2)
+
+        OfferedService offeredService3 = new OfferedService();
+        offeredService3.setName("Meditation Class");
+        offeredService3.setDescription("Guided meditation session");
+        offeredService3.setPrice(200.0);
+        offeredService3.setAdmin(admin2); // Associate the service with the admin2
+        offeredService3 = offeredServiceRepo.save(offeredService3);
+
+
+        // Service (admin1)
         OfferedService offeredService = new OfferedService();
         offeredService.setName("Private Yoga");
         offeredService.setDescription("1-on-1 session");

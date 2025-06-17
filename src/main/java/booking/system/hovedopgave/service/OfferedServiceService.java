@@ -3,6 +3,7 @@ package booking.system.hovedopgave.service;
 import booking.system.hovedopgave.dto.OfferedServiceRequest;
 import booking.system.hovedopgave.dto.OfferedServiceResponse;
 import booking.system.hovedopgave.exception.OfferedServiceException;
+import booking.system.hovedopgave.model.Admin;
 import booking.system.hovedopgave.model.OfferedService;
 import booking.system.hovedopgave.repository.OfferedServiceRepository;
 import booking.system.hovedopgave.repository.TimeSlotRepository;
@@ -11,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class OfferedServiceService {
@@ -43,10 +45,14 @@ public class OfferedServiceService {
     }
 
     public OfferedServiceResponse createService(OfferedServiceRequest offeredServiceRequest) {
+          Long adminId = adminService.getCurrentAuthenticatedAdminId();
+          Admin admin = adminService.getAdminById(adminId);
+
         try {
             validateServiceRequest(offeredServiceRequest);
 
             OfferedService offeredService = new OfferedService();
+            offeredService.setAdmin(admin);
             offeredService.setName(offeredServiceRequest.name());
             offeredService.setDescription(offeredServiceRequest.description());
             offeredService.setPrice(offeredServiceRequest.price());
@@ -61,6 +67,8 @@ public class OfferedServiceService {
 
     //Had to use the TimeSlotRepository directly to avoid circular dependency issues
     public void deleteService(Long id) {
+        ensureAdminOwnsService(id);
+
         if (!offeredServiceRepository.existsById(id)) {
             throw new OfferedServiceException("Service with ID " + id + " does not exist");
         }
@@ -69,6 +77,16 @@ public class OfferedServiceService {
         }
         offeredServiceRepository.deleteById(id);
     }
+
+    private void ensureAdminOwnsService(Long offeredServiceId) {
+        Long adminId = adminService.getCurrentAuthenticatedAdminId();
+        OfferedService service = getServiceById(offeredServiceId);
+
+        if (!service.getAdmin().getId().equals(adminId)) {
+            throw new OfferedServiceException("You do not have permission to access this service");
+        }
+    }
+
 
     public void validateServiceRequest(OfferedServiceRequest request) {
         if (request.price() <= 0) {
@@ -84,7 +102,8 @@ public class OfferedServiceService {
                 offeredService.getId(),
                 offeredService.getName(),
                 offeredService.getDescription(),
-                offeredService.getPrice()
+                offeredService.getPrice(),
+                offeredService.getAdmin().getId()
         );
     }
 }
