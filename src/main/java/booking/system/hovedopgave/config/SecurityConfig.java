@@ -43,7 +43,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/admin").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/admin/names").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/offered-services").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/admin/auth-check").permitAll()
                         .anyRequest().authenticated()
                 )
 
