@@ -17,10 +17,12 @@ public class BookingService {
 
     private final BookingRepository bookingRepository;
     private final TimeSlotService timeSlotService;
+    private final AdminService adminService;
 
-    public BookingService(BookingRepository bookingRepository, TimeSlotService timeSlotService) {
+    public BookingService(BookingRepository bookingRepository, TimeSlotService timeSlotService, AdminService adminService) {
         this.bookingRepository = bookingRepository;
         this.timeSlotService = timeSlotService;
+        this.adminService = adminService;
     }
 
     @Transactional
@@ -52,6 +54,14 @@ public class BookingService {
 
     public List<Booking> getAllBookings() {
         return bookingRepository.findAll();
+    }
+
+    public List<BookingResponse> getAllBookingsForCurrentAdmin() {
+        Long adminId = adminService.getCurrentAuthenticatedAdminId();
+        List<Booking> bookings = bookingRepository.findAllByAdminId(adminId);
+        return bookings.stream()
+                .map(this::toDto)
+                .toList();
     }
 
     public void deleteBooking(Long id) {

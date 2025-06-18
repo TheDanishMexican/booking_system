@@ -29,11 +29,8 @@ public class BookingController {
 
     @GetMapping
     public ResponseEntity<List<BookingResponse>> getAllBookings() {
-        List<Booking> bookings = bookingService.getAllBookings();
-        List<BookingResponse> responses = bookings.stream()
-                .map(bookingService::toDto)
-                .toList();
-        return ResponseEntity.ok(responses);
+        List<BookingResponse> bookings = bookingService.getAllBookingsForCurrentAdmin();
+        return ResponseEntity.ok(bookings);
     }
 
     @DeleteMapping("/{id}")
