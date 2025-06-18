@@ -33,4 +33,6 @@ SELECT CASE WHEN COUNT(t) > 0 THEN true ELSE false END
     boolean existsOverlappingTimeSlot(@Param("startTime") LocalDateTime startTime,
                                       @Param("endTime") LocalDateTime endTime);
 
+    List<TimeSlot> findByOfferedServiceAdminIdAndStartTimeAfter(Long adminId, LocalDateTime now);
+
 }

@@ -7,6 +7,7 @@ import booking.system.hovedopgave.exception.BookingException;
 import booking.system.hovedopgave.exception.TimeSlotException;
 import booking.system.hovedopgave.model.OfferedService;
 import booking.system.hovedopgave.model.TimeSlot;
+import booking.system.hovedopgave.repository.AdminRepository;
 import booking.system.hovedopgave.repository.BookingRepository;
 import booking.system.hovedopgave.repository.TimeSlotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +27,13 @@ public class TimeSlotService {
     private final TimeSlotRepository timeSlotRepository;
     private final OfferedServiceService offeredServiceService;
     private final BookingRepository bookingRepository;
+    private final AdminService adminService;
 
-    public TimeSlotService(TimeSlotRepository timeSlotRepository, OfferedServiceService offeredServiceService, BookingRepository bookingRepository) {
+    public TimeSlotService(TimeSlotRepository timeSlotRepository, OfferedServiceService offeredServiceService, BookingRepository bookingRepository, AdminService adminService) {
         this.timeSlotRepository = timeSlotRepository;
         this.offeredServiceService = offeredServiceService;
         this.bookingRepository = bookingRepository;
+        this.adminService = adminService;
     }
 
     public List<TimeSlotResponse> getAllFutureTimeSlots() {
@@ -155,6 +158,15 @@ public class TimeSlotService {
 
     public List<TimeSlotResponse> getPastTimeSlots() {
         List<TimeSlot> slots = timeSlotRepository.findByStartTimeBefore(LocalDateTime.now());
+        return slots.stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<TimeSlotResponse> getAdminTimeSlots() {
+        Long adminId = adminService.getCurrentAuthenticatedAdminId();
+        List<TimeSlot> slots = timeSlotRepository.findByOfferedServiceAdminIdAndStartTimeAfter(adminId, LocalDateTime.now());
+
         return slots.stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
