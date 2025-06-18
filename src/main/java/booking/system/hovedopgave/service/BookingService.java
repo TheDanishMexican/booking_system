@@ -65,6 +65,8 @@ public class BookingService {
     }
 
     public void deleteBooking(Long id) {
+        ensureAdminOwnsBooking(id);
+
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new BookingException("Booking with ID " + id + " does not exist"));
         timeSlotService.setTimeSlotAvailable(booking.getTimeSlot().getId());
@@ -75,6 +77,20 @@ public class BookingService {
         if (bookingRepository.existsByEmailAndTimeSlotId(request.email(), request.timeSlotId())) {
             throw new BookingException("A booking with this email and time slot already exists");
         }
+    }
+
+    private void ensureAdminOwnsBooking(Long bookingId) {
+        Long adminId = adminService.getCurrentAuthenticatedAdminId();
+        Booking booking = getBookingById(bookingId);
+
+        if (!booking.getTimeSlot().getOfferedService().getAdmin().getId().equals(adminId)) {
+            throw new BookingException("You do not have permission to access this booking");
+        }
+    }
+
+    private Booking getBookingById(Long bookingId) {
+        return bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new BookingException("Booking with ID " + bookingId + " does not exist"));
     }
 
     public BookingResponse toDto(Booking booking) {

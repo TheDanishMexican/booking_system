@@ -26,7 +26,7 @@ public class OfferedServiceController {
     }
 
 
-    @GetMapping("/admin")
+    @GetMapping("/admin-services")
     public ResponseEntity<List<OfferedServiceResponse>> getServicesForCurrentAdmin() {
         List<OfferedServiceResponse> responses = offeredServiceService.getServicesForCurrentAdmin();
         return ResponseEntity.ok(responses);
