@@ -61,6 +61,12 @@ public class TimeSlotService {
             checkNoOverlappingTimeSlot(request);
 
             OfferedService service = offeredServiceService.getServiceById(request.offeredServiceId());
+            Long adminId = adminService.getCurrentAuthenticatedAdminId();
+
+            if (!service.getAdmin().getId().equals(adminId)) {
+                throw new TimeSlotException("You do not have permission to create a time slot for this service");
+            }
+
 
             validateTimeSlotRequest(request);
 
@@ -81,6 +87,8 @@ public class TimeSlotService {
     }
 
     public void deleteTimeSlot(Long id) {
+        ensureAdminOwnsTimeSlot(id);
+
         if (!timeSlotRepository.existsById(id)) {
             throw new TimeSlotException("TimeSlot with ID " + id + " does not exist");
         }
@@ -170,6 +178,15 @@ public class TimeSlotService {
         return slots.stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
+    }
+
+    public void ensureAdminOwnsTimeSlot(Long timeSlotId) {
+        Long adminId = adminService.getCurrentAuthenticatedAdminId();
+        TimeSlot timeSlot = getTimeSlotById(timeSlotId);
+
+        if (!timeSlot.getOfferedService().getAdmin().getId().equals(adminId)) {
+            throw new TimeSlotException("You do not have permission to access this time slot");
+        }
     }
 }
 
