@@ -71,4 +71,8 @@ public class AdminDetails implements UserDetails {
     public Admin getAdmin() {
         return this.admin;
     }
+
+    public String getName() {
+        return admin.getName(); // Returns the name of the admin
+    }
 }

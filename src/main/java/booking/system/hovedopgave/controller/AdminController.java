@@ -1,11 +1,10 @@
 package booking.system.hovedopgave.controller;
 
-import booking.system.hovedopgave.dto.AdminSummaryRequest;
+import booking.system.hovedopgave.dto.AdminSummaryResponse;
 import booking.system.hovedopgave.model.Admin;
 import booking.system.hovedopgave.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,12 +28,13 @@ public class AdminController {
 
     @GetMapping("/auth-check")
     public ResponseEntity<String> authCheck() {
-        return ResponseEntity.ok("Authenticated");
+        String adminName = adminService.getCurrentAuthenticatedAdminName();
+        return ResponseEntity.ok(adminName);
     }
 
     @GetMapping("/names")
-    public ResponseEntity<List<AdminSummaryRequest>> getAdminNames() {
-        List<AdminSummaryRequest> summaries = adminService.getAllAdminSummaries();
+    public ResponseEntity<List<AdminSummaryResponse>> getAdminNames() {
+        List<AdminSummaryResponse> summaries = adminService.getAllAdminSummaries();
         return ResponseEntity.ok(summaries);
     }
 
