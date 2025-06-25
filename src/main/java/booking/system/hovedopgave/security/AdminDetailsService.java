@@ -14,7 +14,6 @@ public class AdminDetailsService implements UserDetailsService {
 
     private final AdminRepository adminRepository;
 
-    @Autowired
     public AdminDetailsService(AdminRepository adminRepository) {
         this.adminRepository = adminRepository;
     }

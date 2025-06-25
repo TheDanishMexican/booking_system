@@ -1,12 +1,15 @@
 package booking.system.hovedopgave.service;
 
+import booking.system.hovedopgave.dto.AdminRequest;
 import booking.system.hovedopgave.dto.AdminSummaryResponse;
+import booking.system.hovedopgave.exception.AdminException;
 import booking.system.hovedopgave.model.Admin;
 import booking.system.hovedopgave.repository.AdminRepository;
 import booking.system.hovedopgave.security.AdminDetails;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -23,14 +26,24 @@ public AdminService(AdminRepository adminRepository, PasswordEncoder passwordEnc
 
     public Admin getAdminById(Long id) {
         return adminRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Admin not found"));
+                .orElseThrow(() -> new AdminException("Admin not found"));
     }
 
 
+    @Transactional
+    public AdminSummaryResponse createAdmin(AdminRequest request) {
+        try {
+            Admin admin = new Admin();
+            admin.setEmail(request.email());
+            admin.setName(request.name());
+            admin.setPassword(passwordEncoder.encode(request.password()));
+            admin = adminRepository.save(admin);
 
-    public Admin saveAdmin(Admin admin) {
-        admin.setPassword(passwordEncoder.encode(admin.getPassword())); // Ensure password is set before saving
-        return adminRepository.save(admin);
+            return toDto(admin);
+
+        } catch (Exception e) {
+            throw new AdminException("Admin creation failed: " + e.getMessage(), e);
+        }
     }
 
     public Long getCurrentAuthenticatedAdminId() {
@@ -40,7 +53,7 @@ public AdminService(AdminRepository adminRepository, PasswordEncoder passwordEnc
             return adminDetails.getId(); // 👈 directly gets the admin's ID from the session
         }
 
-        throw new RuntimeException("Could not identify authenticated admin");
+        throw new AdminException("Could not identify authenticated admin");
     }
 
     public String getCurrentAuthenticatedAdminName() {
@@ -50,7 +63,7 @@ public AdminService(AdminRepository adminRepository, PasswordEncoder passwordEnc
             return adminDetails.getName();
         }
 
-        throw new RuntimeException("Could not identify authenticated admin");
+        throw new AdminException("Could not identify authenticated admin");
     }
 
     public AdminSummaryResponse toDto(Admin admin) {

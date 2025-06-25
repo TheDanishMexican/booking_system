@@ -12,6 +12,7 @@ import booking.system.hovedopgave.repository.BookingRepository;
 import booking.system.hovedopgave.repository.TimeSlotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -56,6 +57,7 @@ public class TimeSlotService {
         }
     }
 
+    @Transactional
     public TimeSlotResponse createTimeSlot(TimeSlotRequest request) {
         try {
             checkNoOverlappingTimeSlot(request);
@@ -86,6 +88,7 @@ public class TimeSlotService {
         }
     }
 
+    @Transactional
     public void deleteTimeSlot(Long id) {
         ensureAdminOwnsTimeSlot(id);
 

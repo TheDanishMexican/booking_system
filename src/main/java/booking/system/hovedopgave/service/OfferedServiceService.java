@@ -10,6 +10,7 @@ import booking.system.hovedopgave.repository.TimeSlotRepository;
 import booking.system.hovedopgave.security.AdminDetails;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -44,6 +45,7 @@ public class OfferedServiceService {
                 .orElseThrow(() -> new OfferedServiceException("Service not found with id: " + id));
     }
 
+    @Transactional
     public OfferedServiceResponse createService(OfferedServiceRequest offeredServiceRequest) {
           Long adminId = adminService.getCurrentAuthenticatedAdminId();
           Admin admin = adminService.getAdminById(adminId);
@@ -65,6 +67,7 @@ public class OfferedServiceService {
         }
     }
 
+    @Transactional
     //Had to use the TimeSlotRepository directly to avoid circular dependency issues
     public void deleteService(Long id) {
         ensureAdminOwnsService(id);

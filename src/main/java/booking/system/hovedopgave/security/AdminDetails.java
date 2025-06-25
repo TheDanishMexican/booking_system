@@ -1,6 +1,7 @@
 package booking.system.hovedopgave.security;
 
 import booking.system.hovedopgave.model.Admin;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,6 +11,7 @@ import java.util.List;
 
 // This class adapts your Admin model to work with Spring Security.
 // It implements UserDetails, which is the interface Spring Security uses to represent users.
+
 public class AdminDetails implements UserDetails {
     private final Admin admin;
 
@@ -66,10 +68,6 @@ public class AdminDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
-    }
-
-    public Admin getAdmin() {
-        return this.admin;
     }
 
     public String getName() {

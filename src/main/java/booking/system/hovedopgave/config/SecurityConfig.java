@@ -21,7 +21,6 @@ public class SecurityConfig {
 
     private final AdminDetailsService adminDetailsService;
 
-    @Autowired
     public SecurityConfig(AdminDetailsService adminDetailsService) {
         this.adminDetailsService = adminDetailsService;
     }
@@ -29,64 +28,61 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // Disable CSRF protection (because we're using a stateless frontend or REST API)
+                // CSRF is disabled for stateless REST API use with frontend
                 .csrf(AbstractHttpConfigurer::disable)
 
-                // Enable CORS and load configuration from our custom CorsConfigurationSource
+                // CORS is enabled to allow frontend requests from configured origins
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-                // Define which endpoints are public and which require authentication
+                // Public and protected endpoint access rules
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/offered-services").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/timeslots/service/{serviceId}").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/bookings").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/admin").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/admin/names").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/offered-services").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().hasRole("ADMIN")
                 )
 
-                // Configure form-based login (used by the frontend to log in via POST to /login)
+                // Custom form login for authentication via POST to /login
                 .formLogin(form -> form
-                        .loginProcessingUrl("/login") // This is the endpoint the frontend posts to
-                        .successHandler((request, response, authentication) -> response.setStatus(200)) // Return 200 on success
-                        .failureHandler((request, response, exception) -> response.setStatus(401))     // Return 401 on failure
+                        .loginProcessingUrl("/login")
+                        .successHandler((request, response, authentication) -> response.setStatus(200))
+                        .failureHandler((request, response, exception) -> response.setStatus(401))
                         .permitAll()
                 )
 
-                // Return 401 instead of redirect when unauthenticated access is attempted (important for SPAs)
+                // Return 401 Unauthorized instead of redirect for unauthenticated access
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(401);
                         })
                 )
 
-                // Configure logout behavior
+                // Logout configuration: clear session and cookies
                 .logout(logout -> logout
-                        .logoutUrl("/logout") // The endpoint to trigger logout
-                        .invalidateHttpSession(true) // Invalidate the HTTP session
-                        .deleteCookies("JSESSIONID") // Remove the session cookie
+                        .logoutUrl("/logout")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
                         .logoutSuccessHandler((request, response, authentication) -> {
-                            response.setStatus(200); // Tell frontend logout succeeded
+                            response.setStatus(200);
                         })
                 )
 
-                // Use our custom user details service (loads Admin users)
+                // Use custom UserDetailsService for admin authentication
                 .userDetailsService(adminDetailsService);
 
-        return http.build(); // Build and return the security filter chain
+        return http.build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        // Define which origins, methods, and headers are allowed for cross-origin requests
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("http://localhost:3000"); // Allow frontend to communicate with backend
-        configuration.addAllowedMethod("*");                     // Allow all HTTP methods (GET, POST, etc.)
-        configuration.setAllowCredentials(true);                 // Allow cookies to be sent
-        configuration.addAllowedHeader("*");                     // Allow all headers
+        configuration.addAllowedOrigin("http://localhost:3000"); // Allow frontend development server
+        configuration.addAllowedMethod("*");                     // Allow all HTTP methods
+        configuration.setAllowCredentials(true);                 // Allow cookies/session
+        configuration.addAllowedHeader("*");                     // Allow all request headers
 
-        // Register this configuration for all paths
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
@@ -94,7 +90,6 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // Use bcrypt to hash passwords (required by Spring Security)
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(); // Secure password hashing
     }
 }

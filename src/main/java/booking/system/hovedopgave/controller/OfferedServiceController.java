@@ -3,6 +3,7 @@ package booking.system.hovedopgave.controller;
 import booking.system.hovedopgave.dto.OfferedServiceRequest;
 import booking.system.hovedopgave.dto.OfferedServiceResponse;
 import booking.system.hovedopgave.service.OfferedServiceService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,14 +33,6 @@ public class OfferedServiceController {
         return ResponseEntity.ok(responses);
     }
 
-//    @GetMapping
-//    public ResponseEntity<List<OfferedServiceResponse>> getAllServices() {
-//        List<OfferedServiceResponse> responses = offeredServiceService.getAllServices().stream()
-//                .map(offeredServiceService::toDto)
-//                .toList();
-//        return ResponseEntity.ok(responses);
-//    }
-
     @GetMapping("/{id}")
     public ResponseEntity<OfferedServiceResponse> getServiceById(@PathVariable Long id) {
         return ResponseEntity.ok(
@@ -48,7 +41,7 @@ public class OfferedServiceController {
     }
 
     @PostMapping
-    public ResponseEntity<OfferedServiceResponse> createService(@RequestBody OfferedServiceRequest offeredServiceRequest) {
+    public ResponseEntity<OfferedServiceResponse> createService(@Valid @RequestBody OfferedServiceRequest offeredServiceRequest) {
         OfferedServiceResponse created = offeredServiceService.createService(offeredServiceRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }

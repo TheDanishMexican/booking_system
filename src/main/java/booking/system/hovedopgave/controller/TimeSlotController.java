@@ -23,14 +23,6 @@ public class TimeSlotController {
         this.timeSlotService = timeSlotService;
     }
 
-//    @GetMapping
-//    public List<TimeSlotResponse> getAllTimeSlots(@RequestParam(defaultValue = "future") String type) {
-//        if ("past".equals(type)) {
-//            return timeSlotService.getPastTimeSlots();
-//        }
-//        return timeSlotService.getAllFutureTimeSlots();
-//    }
-
     @GetMapping
     public ResponseEntity<List<TimeSlotResponse>> getAdminTimeSlots() {
          List<TimeSlotResponse> responses = timeSlotService.getAdminTimeSlots();
