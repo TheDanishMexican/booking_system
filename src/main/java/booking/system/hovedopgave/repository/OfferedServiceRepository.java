@@ -8,6 +8,8 @@ import java.util.List;
 
 @Repository
 public interface OfferedServiceRepository extends JpaRepository<OfferedService, Long> {
-    boolean existsByName(String name);
+
+    Boolean existsByName(String name);
+
     List<OfferedService> findByAdminId(Long adminId);
 }

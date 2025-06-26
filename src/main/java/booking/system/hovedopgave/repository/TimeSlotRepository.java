@@ -19,9 +19,7 @@ public interface TimeSlotRepository extends JpaRepository<TimeSlot, Long> {
                 AND t.startTime < :endOfDay
                 AND t.isAvailable = true
                 """)
-    List<TimeSlot> findAvailableByServiceIdAndDate(Long serviceId, LocalDateTime startOfDay, LocalDateTime endOfDay);
-
-    List<TimeSlot> findByStartTimeAfter(LocalDateTime now);
+    List<TimeSlot> findAvailableByServiceIdAndDate(@Param("serviceId") Long serviceId, @Param("startOfDay") LocalDateTime startOfDay, @Param("endOfDay") LocalDateTime endOfDay);
 
     Boolean existsByOfferedServiceId(Long id);
 
@@ -32,7 +30,7 @@ public interface TimeSlotRepository extends JpaRepository<TimeSlot, Long> {
                 AND t.endTime > :startTime
                 AND t.offeredService.admin.id = :adminId
                 """)
-    boolean existsOverlappingTimeSlot(@Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime, @Param("adminId") Long adminId);
+    Boolean existsOverlappingTimeSlot(@Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime, @Param("adminId") Long adminId);
 
     List<TimeSlot> findByOfferedServiceAdminIdAndStartTimeAfter(Long adminId, LocalDateTime now);
 
