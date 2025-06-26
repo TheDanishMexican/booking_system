@@ -103,8 +103,10 @@ public class TimeSlotService {
         timeSlotRepository.save(timeSlot);
     }
 
+
     //Had to use the BookingRepository directly to avoid circular dependency issues
-    public void setTimeSlotUnavailableIfFull(TimeSlot timeSlot) {
+    //This is used after a booking is made to check if the time slot is full and update its availability status
+    public void checkTimeSlotAvailabilityAndUpdateIfFull(TimeSlot timeSlot) {
         if (bookingRepository.countByTimeSlotId(timeSlot.getId()) >= timeSlot.getMaxParticipants()) {
             setTimeSlotAsUnavailable(timeSlot);
         }
@@ -116,6 +118,7 @@ public class TimeSlotService {
         timeSlotRepository.save(timeSlot);
     }
 
+    // Checks if the time slot is available before booking to avoid exceeding max participants
     public void checkTimeSlotAvailability(TimeSlot timeSlot) {
         if (!timeSlot.getIsAvailable()) {
             throw new TimeSlotException("Time slot full, not available for booking");

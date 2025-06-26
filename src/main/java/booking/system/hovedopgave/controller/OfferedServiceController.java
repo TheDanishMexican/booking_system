@@ -22,7 +22,7 @@ public class OfferedServiceController {
 
     @GetMapping
     public ResponseEntity<List<OfferedServiceResponse>> getServicesByAdminId(@RequestParam Long adminId) {
-        List<OfferedServiceResponse> responses = offeredServiceService.getServicesByTeacherId(adminId);
+        List<OfferedServiceResponse> responses = offeredServiceService.getServicesByAdminId(adminId);
         return ResponseEntity.ok(responses);
     }
 
@@ -31,13 +31,6 @@ public class OfferedServiceController {
     public ResponseEntity<List<OfferedServiceResponse>> getServicesForCurrentAdmin() {
         List<OfferedServiceResponse> responses = offeredServiceService.getServicesForCurrentAdmin();
         return ResponseEntity.ok(responses);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<OfferedServiceResponse> getServiceById(@PathVariable Long id) {
-        return ResponseEntity.ok(
-                offeredServiceService.toDto(offeredServiceService.getServiceById(id))
-        );
     }
 
     @PostMapping

@@ -43,7 +43,7 @@ public class BookingService {
             booking.setPaid(true);
             booking = bookingRepository.save(booking);
 
-            timeSlotService.setTimeSlotUnavailableIfFull(timeSlot);
+            timeSlotService.checkTimeSlotAvailabilityAndUpdateIfFull(timeSlot);
 
             return toDto(booking);
 
@@ -55,20 +55,20 @@ public class BookingService {
     public List<BookingResponse> getAllBookingsForCurrentAdmin() {
         Long adminId = adminService.getCurrentAuthenticatedAdminId();
         List<Booking> bookings = bookingRepository.findAllByAdminId(adminId);
-        return bookings.stream()
-                .map(this::toDto)
-                .toList();
+        return bookings.stream().map(this::toDto).toList();
     }
 
     @Transactional
     public void deleteBooking(Long id) {
         ensureAdminOwnsBooking(id);
 
-        Booking booking = bookingRepository.findById(id)
-                .orElseThrow(() -> new BookingException("Booking with ID " + id + " does not exist"));
+        Booking booking = bookingRepository.findById(id).orElseThrow(() -> new BookingException("Booking with ID " + id + " does not exist"));
         TimeSlot timeSlot = booking.getTimeSlot();
         Boolean isAvailable = timeSlot.getIsAvailable();
 
+        // Since a booking was just deleted, the timeslot may now have available spots.
+        // If it was previously full (unavailable), mark it as available.
+        // If it was already available, do nothing to avoid unnecessary updates.
         if (!isAvailable) {
             timeSlotService.setTimeSlotAvailable(timeSlot.getId());
         }
@@ -92,22 +92,13 @@ public class BookingService {
     }
 
     private Booking getBookingById(Long bookingId) {
-        return bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new BookingException("Booking with ID " + bookingId + " does not exist"));
+        return bookingRepository.findById(bookingId).orElseThrow(() -> new BookingException("Booking with ID " + bookingId + " does not exist"));
     }
 
     public BookingResponse toDto(Booking booking) {
         TimeSlotResponse timeSlotResponse = timeSlotService.toDto(booking.getTimeSlot());
 
-        return new BookingResponse(
-                booking.getId(),
-                booking.getName(),
-                booking.getEmail(),
-                booking.getPhone(),
-                timeSlotResponse,
-                booking.getStatus().name(),
-                booking.isPaid()
-        );
+        return new BookingResponse(booking.getId(), booking.getName(), booking.getEmail(), booking.getPhone(), timeSlotResponse, booking.getStatus().name(), booking.isPaid());
     }
 }
 

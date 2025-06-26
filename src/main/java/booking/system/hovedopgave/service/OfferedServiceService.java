@@ -36,10 +36,6 @@ public class OfferedServiceService {
                 .toList();
     }
 
-    public List<OfferedService> getAllServices() {
-        return offeredServiceRepository.findAll();
-    }
-
     public OfferedService getServiceById(Long id) {
         return offeredServiceRepository.findById(id)
                 .orElseThrow(() -> new OfferedServiceException("Service not found with id: " + id));
@@ -110,7 +106,7 @@ public class OfferedServiceService {
         );
     }
 
-    public List<OfferedServiceResponse> getServicesByTeacherId(Long adminId) {
+    public List<OfferedServiceResponse> getServicesByAdminId(Long adminId) {
         List<OfferedService> services = offeredServiceRepository.findByAdminId(adminId);
         if (services.isEmpty()) {
             throw new OfferedServiceException("No services found for admin with ID: " + adminId);
