@@ -29,12 +29,6 @@ public class TimeSlotController {
         return ResponseEntity.ok(responses);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<TimeSlotResponse> getTimeSlotById(@PathVariable Long id) {
-        TimeSlot slot = timeSlotService.getTimeSlotById(id);
-        return ResponseEntity.ok(timeSlotService.toDto(slot));
-    }
-
     @PostMapping
     public ResponseEntity<TimeSlotResponse> createTimeSlot(@Valid @RequestBody TimeSlotRequest timeSlotRequest) {
         TimeSlotResponse created = timeSlotService.createTimeSlot(timeSlotRequest);

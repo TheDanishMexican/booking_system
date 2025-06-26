@@ -66,8 +66,12 @@ public class BookingService {
 
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new BookingException("Booking with ID " + id + " does not exist"));
+        TimeSlot timeSlot = booking.getTimeSlot();
+        Boolean isAvailable = timeSlot.getIsAvailable();
 
-        timeSlotService.setTimeSlotAvailable(booking.getTimeSlot().getId());
+        if (!isAvailable) {
+            timeSlotService.setTimeSlotAvailable(timeSlot.getId());
+        }
 
         bookingRepository.deleteById(id);
     }

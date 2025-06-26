@@ -46,24 +46,22 @@ public AdminService(AdminRepository adminRepository, PasswordEncoder passwordEnc
         }
     }
 
-    public Long getCurrentAuthenticatedAdminId() {
+    private AdminDetails getAuthenticatedAdminDetails() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
         if (principal instanceof AdminDetails adminDetails) {
-            return adminDetails.getId(); // 👈 directly gets the admin's ID from the session
+            return adminDetails;
         }
-
         throw new AdminException("Could not identify authenticated admin");
     }
 
+    public Long getCurrentAuthenticatedAdminId() {
+        AdminDetails adminDetails = getAuthenticatedAdminDetails();
+        return adminDetails.getId();
+    }
+
     public String getCurrentAuthenticatedAdminName() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        if (principal instanceof AdminDetails adminDetails) {
-            return adminDetails.getName();
-        }
-
-        throw new AdminException("Could not identify authenticated admin");
+        AdminDetails adminDetails = getAuthenticatedAdminDetails();
+        return adminDetails.getName();
     }
 
     public AdminSummaryResponse toDto(Admin admin) {

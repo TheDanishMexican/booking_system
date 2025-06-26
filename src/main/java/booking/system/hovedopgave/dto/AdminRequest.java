@@ -10,7 +10,7 @@ public record AdminRequest(
         String email,
 
         @NotBlank(message = "Password is required")
-        @Size(min = 6, message = "Password must be at least 6 characters")
+        @Size(min = 6, max = 100, message = "Password must be between 6-100 characters")
         String password,
 
         @NotBlank(message = "Name is required")
