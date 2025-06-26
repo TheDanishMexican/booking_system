@@ -14,107 +14,119 @@ public class DataInit implements CommandLineRunner {
     private final AdminRepository adminRepo;
     private final OfferedServiceRepository offeredServiceRepo;
     private final TimeSlotRepository timeSlotRepo;
+    private final BookingRepository bookingRepo;
     private final PasswordEncoder passwordEncoder;
 
     public DataInit(
             AdminRepository adminRepo,
             OfferedServiceRepository offeredServiceRepo,
-            TimeSlotRepository timeSlotRepo
-            , PasswordEncoder passwordEncoder
+            TimeSlotRepository timeSlotRepo,
+            BookingRepository bookingRepo,
+            PasswordEncoder passwordEncoder
     ) {
         this.adminRepo = adminRepo;
         this.offeredServiceRepo = offeredServiceRepo;
         this.timeSlotRepo = timeSlotRepo;
+        this.bookingRepo = bookingRepo;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public void run(String... args) {
 
-
-        // Admin
-        Admin admin = new Admin();
-        admin.setEmail("yogamaster@email.com");
-        admin.setPassword(passwordEncoder.encode("secret"));
-        admin.setName("Anna Lastname");
-        admin = adminRepo.save(admin);
+        // Create 3 Admins
+        Admin admin1 = new Admin();
+        admin1.setName("John Doe");
+        admin1.setEmail("yogamaster@email.com");
+        admin1.setPassword(passwordEncoder.encode("secret123"));
+        admin1 = adminRepo.save(admin1);
 
         Admin admin2 = new Admin();
+        admin2.setName("Jane Smith");
         admin2.setEmail("test@email.com");
         admin2.setPassword(passwordEncoder.encode("test123"));
-        admin2.setName("Test Admin");
         admin2 = adminRepo.save(admin2);
 
         Admin admin3 = new Admin();
+        admin3.setName("Alice Johnson");
         admin3.setEmail("daniel@email.com");
         admin3.setPassword(passwordEncoder.encode("daniel123"));
-        admin3.setName("Daniel Lastname");
         admin3 = adminRepo.save(admin3);
 
-        // OfferedService (admin3)
+        Admin[] admins = {admin1, admin2, admin3};
 
-        OfferedService offeredService4 = new OfferedService();
-        offeredService4.setName("Advanced Yoga");
-        offeredService4.setDescription("Advanced yoga techniques for experienced practitioners");
-        offeredService4.setPrice(400.0);
-        offeredService4.setAdmin(admin3); // Associate the service with the admin3
-        offeredService4 = offeredServiceRepo.save(offeredService4);
+        // Start from tomorrow
+        LocalDateTime startDate = LocalDateTime.now()
+                .plusDays(1)
+                .withHour(10).withMinute(0);
 
-        // service (admin2)
+        for (int i = 0; i < admins.length; i++) {
+            Admin admin = admins[i];
 
-        OfferedService offeredService3 = new OfferedService();
-        offeredService3.setName("Meditation Class");
-        offeredService3.setDescription("Guided meditation session");
-        offeredService3.setPrice(200.0);
-        offeredService3.setAdmin(admin2); // Associate the service with the admin2
-        offeredService3 = offeredServiceRepo.save(offeredService3);
+            // Create 2 services
+            OfferedService privateService = new OfferedService();
+            privateService.setName("Private Session");
+            privateService.setDescription("1-on-1 personalized yoga class");
+            privateService.setPrice(300.0);
+            privateService.setAdmin(admin);
+            privateService = offeredServiceRepo.save(privateService);
 
+            OfferedService groupService = new OfferedService();
+            groupService.setName("Group Session");
+            groupService.setDescription("Yoga class for up to 5 participants");
+            groupService.setPrice(150.0);
+            groupService.setAdmin(admin);
+            groupService = offeredServiceRepo.save(groupService);
 
-        // Service (admin1)
-        OfferedService offeredService = new OfferedService();
-        offeredService.setName("Private Yoga");
-        offeredService.setDescription("1-on-1 session");
-        offeredService.setPrice(300.0);
-        offeredService.setAdmin(admin); // Associate the service with the admin
-        offeredService = offeredServiceRepo.save(offeredService);
+            TimeSlot[] privateSlots = new TimeSlot[7];
+            TimeSlot[] groupSlots = new TimeSlot[7];
 
-        OfferedService offeredService2 = new OfferedService();
-        offeredService2.setName("Group Yoga");
-        offeredService2.setDescription("Group session for up to 5 people");
-        offeredService2.setPrice(150.0);
-        offeredService2.setAdmin(admin); // Associate the service with the admin
-        offeredService2 = offeredServiceRepo.save(offeredService2);
+            for (int j = 0; j < 7; j++) {
+                LocalDateTime day = startDate.plusDays(j);
 
-        // TimeSlot
-        TimeSlot timeSlot = new TimeSlot();
-        timeSlot.setStartTime(LocalDateTime.of(2025, 6, 19, 10, 0));
-        timeSlot.setEndTime(LocalDateTime.of(2025, 6, 19, 11, 0));
-        timeSlot.setOfferedService(offeredService);
-        timeSlot.setLocation("100 Main Street, Yoga Studio City");
-        timeSlot.setMaxParticipants(1);
-        timeSlot.setIsAvailable(true);
-        timeSlotRepo.save(timeSlot);
+                // Private session slot (10:00–11:00)
+                TimeSlot privateSlot = new TimeSlot();
+                privateSlot.setStartTime(day);
+                privateSlot.setEndTime(day.plusHours(1));
+                privateSlot.setOfferedService(privateService);
+                privateSlot.setLocation("123 Yoga Street");
+                privateSlot.setMaxParticipants(1);
+                privateSlot.setIsAvailable(true);
+                privateSlot = timeSlotRepo.save(privateSlot);
+                privateSlots[j] = privateSlot;
 
-        TimeSlot timeSlot2 = new TimeSlot();
-        timeSlot2.setStartTime(LocalDateTime.of(2025, 6, 30, 11, 0));
-        timeSlot2.setEndTime(LocalDateTime.of(2025, 6, 30, 12, 0));
-        timeSlot2.setOfferedService(offeredService2);
-        timeSlot2.setLocation("100 Main Street, Yoga Studio City");
-        timeSlot2.setMaxParticipants(5);
-        timeSlot2.setIsAvailable(true);
-        timeSlotRepo.save(timeSlot2);
+                // Group session slot (12:00–13:00)
+                TimeSlot groupSlot = new TimeSlot();
+                groupSlot.setStartTime(day.plusHours(2));
+                groupSlot.setEndTime(day.plusHours(3));
+                groupSlot.setOfferedService(groupService);
+                groupSlot.setLocation("123 Yoga Street");
+                groupSlot.setMaxParticipants(5);
+                groupSlot.setIsAvailable(true);
+                groupSlot = timeSlotRepo.save(groupSlot);
+                groupSlots[j] = groupSlot;
+            }
 
-        TimeSlot timeSlot3 = new TimeSlot();
-        timeSlot3.setStartTime(LocalDateTime.of(2025, 6, 17, 9, 0));
-        timeSlot3.setEndTime(LocalDateTime.of(2025, 6, 17, 10, 0));
-        timeSlot3.setOfferedService(offeredService);
-        timeSlot3.setLocation("100 Main Street, Yoga Studio City");
-        timeSlot3.setMaxParticipants(1);
-        timeSlot3.setIsAvailable(true);
-        timeSlotRepo.save(timeSlot3);
+            // Create bookings using first slots
+            Booking booking1 = new Booking();
+            booking1.setTimeSlot(privateSlots[0]);
+            booking1.setName("Bob Dylan");
+            booking1.setEmail("customer" + (i) + "@mail.com");
+            booking1.setPhone("12345678");
+            booking1.setStatus(BookingStatus.CONFIRMED);
+            booking1.setPaid(true);
+            bookingRepo.save(booking1);
 
+            Booking booking2 = new Booking();
+            booking2.setTimeSlot(groupSlots[0]);
+            booking2.setName("Mette Frederiksen");
+            booking2.setEmail("customer" + (i + 1) + "@mail.com");
+            booking2.setPhone("12345678");
+            booking2.setStatus(BookingStatus.CONFIRMED);
+            booking2.setPaid(true);
+            bookingRepo.save(booking2);
+        }
 
-        System.out.println("✅ Test data created successfully!");
+        System.out.println("✅ Test data with admins, services, timeslots, and bookings created!");
     }
 }
-
