@@ -25,9 +25,6 @@ public record TimeSlotRequest(
         @Positive(message = "Max participants must be a positive number")
         @NotNull(message = "Max participants is required")
         Integer maxParticipants
-
-
-) {
-}
+) {}
 
 

@@ -2,10 +2,8 @@ package booking.system.hovedopgave.controller;
 
 import booking.system.hovedopgave.dto.AdminRequest;
 import booking.system.hovedopgave.dto.AdminSummaryResponse;
-import booking.system.hovedopgave.model.Admin;
 import booking.system.hovedopgave.service.AdminService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

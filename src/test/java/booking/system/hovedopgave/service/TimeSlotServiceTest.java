@@ -128,4 +128,34 @@ public class TimeSlotServiceTest {
 
         assertTrue(exception.getMessage().toLowerCase().contains("duration"), "Should fail because duration is negative");
     }
+
+    /**
+     * Edge case test: verifies that creating a time slot with a start time
+     * set in the past correctly throws a TimeSlotException.
+     * This ensures the system enforces the business rule that time slots
+     * must start in the future.
+     */
+    @Test
+    public void testCreateTimeSlotFailsWhenStartTimeIsInPast_WithAuthentication() {
+        OfferedServiceRequest request = new OfferedServiceRequest(
+                "Meditation",
+                "Mindfulness and relaxation",
+                40.00
+        );
+        OfferedServiceResponse offeredService = offeredServiceService.createService(request);
+
+        TimeSlotRequest timeSlotRequest = new TimeSlotRequest(
+                LocalDateTime.now().minusHours(1),  // start time in the past
+                60,
+                offeredService.id(),
+                "Room 105",
+                10
+        );
+
+        Exception exception = assertThrows(TimeSlotException.class, () -> {
+            timeSlotService.createTimeSlot(timeSlotRequest);
+        });
+
+        assertTrue(exception.getMessage().toLowerCase().contains("start time"), "Should fail because start time is in the past");
+    }
 }

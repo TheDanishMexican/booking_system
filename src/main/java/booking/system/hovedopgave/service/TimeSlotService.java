@@ -37,38 +37,35 @@ public class TimeSlotService {
         this.adminService = adminService;
     }
 
-    public List<TimeSlotResponse> getAllFutureTimeSlots() {
-        List<TimeSlot> slots = timeSlotRepository.findByStartTimeAfter(LocalDateTime.now());
-        return slots.stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
-    }
-
     public TimeSlot getTimeSlotById(Long id) {
-        return timeSlotRepository.findById(id)
-                .orElseThrow(() -> new TimeSlotException("TimeSlot not found with id: " + id));
+        return timeSlotRepository.findById(id).orElseThrow(() -> new TimeSlotException("TimeSlot not found with id: " + id));
     }
 
     public void checkNoOverlappingTimeSlot(TimeSlotRequest request) {
         LocalDateTime startTime = request.startTime();
         LocalDateTime endTime = calculateEndTime(request.duration(), startTime);
-        if(timeSlotRepository.existsOverlappingTimeSlot(startTime, endTime)){
+        Long adminId = adminService.getCurrentAuthenticatedAdminId();
+        if (timeSlotRepository.existsOverlappingTimeSlot(startTime, endTime, adminId)) {
             throw new TimeSlotException("Time slot overlaps with an existing time slot");
+        }
+    }
+
+    private void checkAdminPermission(Long adminId, OfferedService service) {
+        if (!service.getAdmin().getId().equals(adminId)) {
+            throw new TimeSlotException("You do not have permission to create a time slot for this service");
         }
     }
 
     @Transactional
     public TimeSlotResponse createTimeSlot(TimeSlotRequest request) {
         try {
-            checkNoOverlappingTimeSlot(request);
-
-            OfferedService service = offeredServiceService.getServiceById(request.offeredServiceId());
             Long adminId = adminService.getCurrentAuthenticatedAdminId();
 
-            if (!service.getAdmin().getId().equals(adminId)) {
-                throw new TimeSlotException("You do not have permission to create a time slot for this service");
-            }
+            OfferedService service = offeredServiceService.getServiceById(request.offeredServiceId());
 
+            checkAdminPermission(adminId, service);
+
+            checkNoOverlappingTimeSlot(request);
 
             validateTimeSlotRequest(request);
 
@@ -101,7 +98,7 @@ public class TimeSlotService {
         timeSlotRepository.deleteById(id);
     }
 
-    private void markAsUnavailableIfFull(TimeSlot timeSlot) {
+    private void setTimeSlotAsUnavailable(TimeSlot timeSlot) {
         timeSlot.setIsAvailable(false);
         timeSlotRepository.save(timeSlot);
     }
@@ -109,7 +106,7 @@ public class TimeSlotService {
     //Had to use the BookingRepository directly to avoid circular dependency issues
     public void setTimeSlotUnavailableIfFull(TimeSlot timeSlot) {
         if (bookingRepository.countByTimeSlotId(timeSlot.getId()) >= timeSlot.getMaxParticipants()) {
-            markAsUnavailableIfFull(timeSlot);
+            setTimeSlotAsUnavailable(timeSlot);
         }
     }
 
@@ -144,15 +141,7 @@ public class TimeSlotService {
         OffsetDateTime startTime = timeSlot.getStartTime().atOffset(ZoneOffset.UTC);
         OffsetDateTime endTime = timeSlot.getEndTime().atOffset(ZoneOffset.UTC);
 
-        return new TimeSlotResponse(
-                timeSlot.getId(),
-                startTime,
-                endTime,
-                timeSlot.getLocation(),
-                timeSlot.getMaxParticipants(),
-                timeSlot.getIsAvailable(),
-                offeredServiceResponse
-        );
+        return new TimeSlotResponse(timeSlot.getId(), startTime, endTime, timeSlot.getLocation(), timeSlot.getMaxParticipants(), timeSlot.getIsAvailable(), offeredServiceResponse);
     }
 
 
@@ -167,20 +156,11 @@ public class TimeSlotService {
         return slots.stream().map(this::toDto).collect(Collectors.toList());
     }
 
-    public List<TimeSlotResponse> getPastTimeSlots() {
-        List<TimeSlot> slots = timeSlotRepository.findByStartTimeBefore(LocalDateTime.now());
-        return slots.stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
-    }
-
     public List<TimeSlotResponse> getAdminTimeSlots() {
         Long adminId = adminService.getCurrentAuthenticatedAdminId();
         List<TimeSlot> slots = timeSlotRepository.findByOfferedServiceAdminIdAndStartTimeAfter(adminId, LocalDateTime.now());
 
-        return slots.stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
+        return slots.stream().map(this::toDto).collect(Collectors.toList());
     }
 
     public void ensureAdminOwnsTimeSlot(Long timeSlotId) {

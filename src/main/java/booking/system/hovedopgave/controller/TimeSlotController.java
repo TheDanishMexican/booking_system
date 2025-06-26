@@ -25,8 +25,8 @@ public class TimeSlotController {
 
     @GetMapping
     public ResponseEntity<List<TimeSlotResponse>> getAdminTimeSlots() {
-         List<TimeSlotResponse> responses = timeSlotService.getAdminTimeSlots();
-                 return ResponseEntity.ok(responses);
+        List<TimeSlotResponse> responses = timeSlotService.getAdminTimeSlots();
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/{id}")
@@ -48,9 +48,7 @@ public class TimeSlotController {
     }
 
     @GetMapping("/service/{serviceId}")
-    public ResponseEntity<List<TimeSlotResponse>> getAvailableSlotsByServiceAndDate(
-            @PathVariable Long serviceId,
-            @RequestParam String date) {
+    public ResponseEntity<List<TimeSlotResponse>> getAvailableSlotsByServiceAndDate(@PathVariable Long serviceId, @RequestParam String date) {
         LocalDate localDate = LocalDate.parse(date);
         List<TimeSlotResponse> slots = timeSlotService.getAvailableTimeSlotsByServiceIdAndDate(serviceId, localDate);
 

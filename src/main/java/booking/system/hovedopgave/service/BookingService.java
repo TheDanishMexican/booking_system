@@ -66,7 +66,9 @@ public class BookingService {
 
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new BookingException("Booking with ID " + id + " does not exist"));
+
         timeSlotService.setTimeSlotAvailable(booking.getTimeSlot().getId());
+
         bookingRepository.deleteById(id);
     }
 
@@ -91,7 +93,7 @@ public class BookingService {
     }
 
     public BookingResponse toDto(Booking booking) {
-       TimeSlotResponse timeSlotResponse = timeSlotService.toDto(booking.getTimeSlot());
+        TimeSlotResponse timeSlotResponse = timeSlotService.toDto(booking.getTimeSlot());
 
         return new BookingResponse(
                 booking.getId(),
