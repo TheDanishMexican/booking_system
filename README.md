@@ -14,16 +14,11 @@ This is a backend for a booking system built with Spring Boot and MySQL. It mana
 
 ## Setup Instructions
 
-### Prerequisites
-- Java 17 or higher
-- MySQL database
-- Maven installed
-
 ### Configuration
 
 The application reads database settings from environment variables defined in a file named `env.properties`. This file is **not included** in the repository and must be created manually.
 
-Create an `env.properties` file in the root of the project with the following content:
+Create an env.properties file in src/main/resources with the following content:
 
 ```properties
 DATABASE_URL=jdbc:mysql://localhost:3306/your_db_name
@@ -45,7 +40,7 @@ Or directly from your IDE if it supports Maven.
 
 ### Running Tests
 
-To run unit tests:
+To run tests:
 
 ```bash
 mvn test
@@ -53,14 +48,12 @@ mvn test
 Or directly from your IDE if it supports Maven.
 ### Test Data
 
-Some test data is automatically inserted on application startup. This is handled by the `DataInit` class located in the `config` package.
+Test data is automatically inserted on application startup. This is handled by the `DataInit` class located in the `config` package.
 
 For each of the 3 test admins, the following is created:
 - 2 services: *Private Session* and *Group Session*
 - For each service, 7 timeslots are created — one for each of the next 7 days, starting from **tomorrow**
 - 2 Bookings
-
-This ensures that when the app is launched, the calendar will show upcoming sessions that are always fresh and intuitive to test.
 
 You can log in using one of the predefined admins:
 

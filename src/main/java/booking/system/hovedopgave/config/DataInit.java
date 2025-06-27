@@ -7,6 +7,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class DataInit implements CommandLineRunner {
@@ -34,7 +36,6 @@ public class DataInit implements CommandLineRunner {
     @Override
     public void run(String... args) {
 
-        // Create 3 Admins
         Admin admin1 = new Admin();
         admin1.setName("John Doe");
         admin1.setEmail("yogamaster@email.com");
@@ -55,7 +56,6 @@ public class DataInit implements CommandLineRunner {
 
         Admin[] admins = {admin1, admin2, admin3};
 
-        // Start from tomorrow
         LocalDateTime startDate = LocalDateTime.now()
                 .plusDays(1)
                 .withHour(10).withMinute(0);
@@ -78,13 +78,12 @@ public class DataInit implements CommandLineRunner {
             groupService.setAdmin(admin);
             groupService = offeredServiceRepo.save(groupService);
 
-            TimeSlot[] privateSlots = new TimeSlot[7];
-            TimeSlot[] groupSlots = new TimeSlot[7];
+            List<TimeSlot> privateSlots = new ArrayList<>();
+            List<TimeSlot> groupSlots = new ArrayList<>();
 
             for (int j = 0; j < 7; j++) {
                 LocalDateTime day = startDate.plusDays(j);
 
-                // Private session slot (10:00–11:00)
                 TimeSlot privateSlot = new TimeSlot();
                 privateSlot.setStartTime(day);
                 privateSlot.setEndTime(day.plusHours(1));
@@ -93,9 +92,8 @@ public class DataInit implements CommandLineRunner {
                 privateSlot.setMaxParticipants(1);
                 privateSlot.setIsAvailable(true);
                 privateSlot = timeSlotRepo.save(privateSlot);
-                privateSlots[j] = privateSlot;
+                privateSlots.add(privateSlot);
 
-                // Group session slot (12:00–13:00)
                 TimeSlot groupSlot = new TimeSlot();
                 groupSlot.setStartTime(day.plusHours(2));
                 groupSlot.setEndTime(day.plusHours(3));
@@ -104,12 +102,11 @@ public class DataInit implements CommandLineRunner {
                 groupSlot.setMaxParticipants(5);
                 groupSlot.setIsAvailable(true);
                 groupSlot = timeSlotRepo.save(groupSlot);
-                groupSlots[j] = groupSlot;
+                groupSlots.add(groupSlot);
             }
 
-            // Create bookings using first slots
             Booking booking1 = new Booking();
-            booking1.setTimeSlot(privateSlots[0]);
+            booking1.setTimeSlot(privateSlots.get(0));
             booking1.setName("Bob Dylan");
             booking1.setEmail("customer" + (i) + "@mail.com");
             booking1.setPhone("12345678");
@@ -118,7 +115,7 @@ public class DataInit implements CommandLineRunner {
             bookingRepo.save(booking1);
 
             Booking booking2 = new Booking();
-            booking2.setTimeSlot(groupSlots[0]);
+            booking2.setTimeSlot(groupSlots.get(0));
             booking2.setName("Mette Frederiksen");
             booking2.setEmail("customer" + (i + 1) + "@mail.com");
             booking2.setPhone("12345678");

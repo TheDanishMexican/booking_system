@@ -66,9 +66,9 @@ public class BookingService {
         TimeSlot timeSlot = booking.getTimeSlot();
         Boolean isAvailable = timeSlot.getIsAvailable();
 
-        // Since a booking was just deleted, the timeslot may now have available spots.
-        // If it was previously full (unavailable), mark it as available.
-        // If it was already available, do nothing to avoid unnecessary updates.
+        // After deleting a booking, the associated time slot may have available space again.
+        // If the time slot was previously full (marked as unavailable), we update it to available.
+        // If it was already available, we skip the update to avoid unnecessary database writes.
         if (!isAvailable) {
             timeSlotService.setTimeSlotAvailable(timeSlot.getId());
         }

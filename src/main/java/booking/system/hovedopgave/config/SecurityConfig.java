@@ -28,13 +28,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // CSRF is disabled for stateless REST API use with frontend
+
                 .csrf(AbstractHttpConfigurer::disable)
 
-                // CORS is enabled to allow frontend requests from configured origins
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-                // Public and protected endpoint access rules
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/offered-services").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/timeslots/service/{serviceId}").permitAll()
@@ -44,7 +42,6 @@ public class SecurityConfig {
                         .anyRequest().hasRole("ADMIN")
                 )
 
-                // Custom form login for authentication via POST to /login
                 .formLogin(form -> form
                         .loginProcessingUrl("/login")
                         .successHandler((request, response, authentication) -> response.setStatus(200))
@@ -52,14 +49,12 @@ public class SecurityConfig {
                         .permitAll()
                 )
 
-                // Return 401 Unauthorized instead of redirect for unauthenticated access
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(401);
                         })
                 )
 
-                // Logout configuration: clear session and cookies
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .invalidateHttpSession(true)
@@ -69,7 +64,6 @@ public class SecurityConfig {
                         })
                 )
 
-                // Use custom UserDetailsService for admin authentication
                 .userDetailsService(adminDetailsService);
 
         return http.build();
@@ -78,10 +72,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("http://localhost:3000"); // Allow frontend development server
-        configuration.addAllowedMethod("*");                     // Allow all HTTP methods
-        configuration.setAllowCredentials(true);                 // Allow cookies/session
-        configuration.addAllowedHeader("*");                     // Allow all request headers
+        configuration.addAllowedOrigin("http://localhost:3000");
+        configuration.addAllowedMethod("*");
+        configuration.setAllowCredentials(true);
+        configuration.addAllowedHeader("*");
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -90,6 +84,6 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Secure password hashing
+        return new BCryptPasswordEncoder();
     }
 }

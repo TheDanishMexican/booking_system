@@ -140,7 +140,11 @@ public class TimeSlotService {
     public TimeSlotResponse toDto(TimeSlot timeSlot) {
         OfferedServiceResponse offeredServiceResponse = offeredServiceService.toDto(timeSlot.getOfferedService());
 
-        // Convert LocalDateTime to OffsetDateTime as UTC
+        // Convert LocalDateTime to OffsetDateTime in UTC.
+        // The frontend sends time data as UTC (converted from the user's local time),
+        // and the backend stores it as-is. To ensure consistency, we convert the stored
+        // time back to UTC when sending the response, so the frontend can safely convert
+        // it back to the user's local time for display.
         OffsetDateTime startTime = timeSlot.getStartTime().atOffset(ZoneOffset.UTC);
         OffsetDateTime endTime = timeSlot.getEndTime().atOffset(ZoneOffset.UTC);
 
