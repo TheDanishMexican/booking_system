@@ -63,7 +63,6 @@ public class DataInit implements CommandLineRunner {
         for (int i = 0; i < admins.length; i++) {
             Admin admin = admins[i];
 
-            // Create 2 services
             OfferedService privateService = new OfferedService();
             privateService.setName("Private Session");
             privateService.setDescription("1-on-1 personalized yoga class");
